@@ -3,3 +3,30 @@
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
+
+/* ==========================================================================
+   Cadastre AI - Obsidian Canvas & Elevated Surface Normalization
+   ========================================================================== */
+
+/* 1. Base Dark Canvas */
+.dark body,
+.dark .fi-layout,
+.dark .fi-main {
+    background-color: #05070b !important;
+}
+
+/* 2. Elevated Dark Containers */
+.dark .fi-topbar,
+.dark .fi-sidebar {
+    background-color: #05070b !important;
+}
+
+/* 3. Hairline Borders across All Elevated Surfaces */
+.dark .fi-section,
+.dark .fi-wi-widget,
+.dark .fi-ta-ctn,
+.dark .fi-topbar,
+.dark .fi-sidebar,
+.dark .fi-modal-window {
+    border-color: rgba(255, 255, 255, 0.07) !important;
+}

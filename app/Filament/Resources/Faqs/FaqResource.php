@@ -7,7 +7,7 @@ namespace App\Filament\Resources\Faqs;
 use App\Filament\Resources\Faqs\Pages\ManageFaqs;
 use App\Models\Faq;
 use BackedEnum;
-use Filament\Actions\Action; // 👈 Import Action
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -18,7 +18,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Utilities\Set; // 👈 Import Set Utility
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
@@ -56,7 +56,7 @@ class FaqResource extends Resource
                                 $set('question', "How does the AI handle multilingual inquiries in French and Arabic? #{$rand}");
                                 $set('target_audience', 'agents');
                                 $set('is_active', true);
-                                $set('answer', '<p>MatchMaker automatically parses inbound text using <strong>Google Gemini</strong> language intelligence, extracting real estate parameters regardless of whether the client writes in French, Arabic, or English.</p>');
+                                $set('answer', '<p>Cadastre AI automatically parses inbound text using <strong>Google Gemini</strong> language intelligence, extracting real estate parameters regardless of whether the client writes in French, Arabic, or English.</p>');
                             }),
                     ])
                     ->columns(2)
@@ -128,7 +128,6 @@ class FaqResource extends Resource
 
                 ToggleColumn::make('is_active')->label('Active')->sortable()->alignCenter()
                     ->disabled(fn(Faq $record): bool => ! auth()->user()->can('Update:Faq') || $record->id === auth()->id()),
-
             ])
             ->filters([
                 TernaryFilter::make('is_active')
@@ -143,8 +142,9 @@ class FaqResource extends Resource
             ])
             ->recordActions([
                 EditAction::make()
-                    ->slideOver(),
-                DeleteAction::make(),
+                    ->slideOver()
+                    ->color('gray'), // Quiet neutral link (illuminates to white on hover)
+                DeleteAction::make(), // Blazing Flame Vermilion (#F95428)
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
