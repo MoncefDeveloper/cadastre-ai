@@ -124,7 +124,7 @@ html.dark {
     background-color: var(--mm-bg-page);
     padding: 2rem 1.5rem;
     box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: var(--font-sans); /* 👈 Updated from hardcoded -apple-system */
     transition: background-color 0.3s ease;
 }
 

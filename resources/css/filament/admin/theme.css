@@ -5,7 +5,61 @@
 @source '../../../../resources/views/filament/**/*';
 
 /* ==========================================================================
-   Cadastre AI - Obsidian Canvas & Elevated Surface Normalization
+   Cadastre AI - Local Typography Architecture (Plus Jakarta Sans)
+   ========================================================================== */
+
+@font-face {
+    font-family: 'Plus Jakarta Sans';
+    src: url('../../../../public/fonts/cadastre/plus-jakarta-sans-400.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Plus Jakarta Sans';
+    src: url('../../../../public/fonts/cadastre/plus-jakarta-sans-500.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Plus Jakarta Sans';
+    src: url('../../../../public/fonts/cadastre/plus-jakarta-sans-600.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Plus Jakarta Sans';
+    src: url('../../../../public/fonts/cadastre/plus-jakarta-sans-700.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@theme {
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Global Font Inheritance */
+body,
+.fi-body,
+.fi-layout {
+    font-family: var(--font-sans) !important;
+}
+
+/* OpenType Tabular Figures: Prevents Price, Clock, and Metric Jitter */
+.fi-ta-cell,
+.fi-wi-stats-overview-stat-value,
+.font-mono {
+    font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   Obsidian Canvas & Elevated Surface Normalization
    ========================================================================== */
 
 /* 1. Base Dark Canvas */
