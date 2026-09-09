@@ -14,17 +14,11 @@ class CreateUser extends CreateRecord
 {
     protected static string $resource = UserResource::class;
 
-    /**
-     * 🔄 Redirect directly back to the Users index table after creation
-     */
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
     }
 
-    /**
-     * ⚡ Quick Fill Header Action for Testing
-     */
     protected function getHeaderActions(): array
     {
         return [
@@ -39,7 +33,7 @@ class CreateUser extends CreateRecord
 
                     $this->form->fill([
                         'name' => 'Yanis Bouzid',
-                        'email' => "yanis.bouzid{$rand}@matchmaker.test",
+                        'email' => "yanis.bouzid{$rand}@cadastre.test",
                         'phone' => '+213 550 11 22 33',
                         'password' => 'password',
                         'is_active' => true,

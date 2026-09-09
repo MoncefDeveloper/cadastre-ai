@@ -18,9 +18,6 @@ trait ManagesInboundSimulator
 {
     public ?array $simulatorData = [];
 
-    /**
-     * Filament Form Schema: 2-Column Section with Embedded Footer Action Button
-     */
     public function simulatorForm(Schema $schema): Schema
     {
         return $schema
@@ -28,7 +25,6 @@ trait ManagesInboundSimulator
                 Section::make('Inbound Webhook Payload')
                     ->description('Customize the incoming webhook data to test real-time AI parsing and inventory matching.')
                     ->schema([
-                        // Line 1: Full Name & Email side-by-side in 2 columns
                         TextInput::make('name')
                             ->label('Client Full Name')
                             ->required()
@@ -41,14 +37,12 @@ trait ManagesInboundSimulator
                             ->placeholder('info+custom@moncefdev.me')
                             ->helperText('⚠️ Deliverability Warning: Please use a real email address (e.g. Gmail/Outlook) so test outbound replies deliver without Postmark bounce penalties.'),
 
-                        // Line 2: Full width Subject
                         TextInput::make('subject')
                             ->label('Inbound Email Subject')
                             ->required()
                             ->placeholder('e.g. Inquiry: Luxury Waterfront Property with Immediate Acquisition')
                             ->columnSpanFull(),
 
-                        // Line 3: Full width Markdown Body
                         MarkdownEditor::make('body')
                             ->label('Message Body (Simulated Inbound Text)')
                             ->placeholder('Type what the client is asking for (e.g., looking for a 5-bedroom villa in Hydra under $5M with a swimming pool)...')
@@ -65,7 +59,6 @@ trait ManagesInboundSimulator
                             ->columnSpanFull(),
                     ])
                     ->footerActions([
-                        // 🚀 Button Embedded Directly Inside the Section Card
                         Action::make('dispatchWebhook')
                             ->label('Dispatch Inbound Webhook Payload')
                             ->icon('heroicon-m-paper-airplane')
@@ -85,13 +78,11 @@ trait ManagesInboundSimulator
             'name' => 'Dr. Malik Mansoor',
             'email' => 'info+custom@moncefdev.me',
             'subject' => 'Inquiry: Luxury Waterfront Property with Immediate Acquisition',
-            'body' => "Hello MatchMaker Team,\n\nWe are looking for a luxury waterfront villa with a private pool and sea view in Oran (Canastel) or Nice. Our maximum budget is $5,000,000.\n\nPlease share suitable listings and availability for an on-site private viewing.",
+            // 👈 Rebranded to Cadastre Team
+            'body' => "Hello Cadastre Team,\n\nWe are looking for a luxury waterfront villa with a private pool and sea view in Oran (Canastel) or Nice. Our maximum budget is $5,000,000.\n\nPlease share suitable listings and availability for an on-site private viewing.",
         ]);
     }
 
-    /**
-     * Dispatches pre-tuned 1-Click Inbound Lead Presets
-     */
     public function simulatePreset(string $presetKey): void
     {
         $presets = [
@@ -99,7 +90,8 @@ trait ManagesInboundSimulator
                 'name' => 'Ambassadorial Office',
                 'email' => 'info+hydra@moncefdev.me',
                 'subject' => 'Diplomatic Residence Requirement — 6 Bedroom Compound in Hydra',
-                'body' => "Dear MatchMaker Private Office,\n\nOur delegation requires an ambassadorial villa in Hydra, Algiers with a minimum of 6 bedrooms, high-security perimeter walls, heated private swimming pool, and underground parking.\n\nOur capital budget allocation is up to $5,000,000. When can we coordinate an architectural inspection?",
+                // 👈 Rebranded to Cadastre Private Office
+                'body' => "Dear Cadastre Private Office,\n\nOur delegation requires an ambassadorial villa in Hydra, Algiers with a minimum of 6 bedrooms, high-security perimeter walls, heated private swimming pool, and underground parking.\n\nOur capital budget allocation is up to $5,000,000. When can we coordinate an architectural inspection?",
             ],
             'paris' => [
                 'name' => 'Nathalie Laurent',
@@ -130,9 +122,6 @@ trait ManagesInboundSimulator
         );
     }
 
-    /**
-     * Dispatches the Custom Webhook Form via Filament Schema Validation
-     */
     public function simulateCustomLead(): void
     {
         $data = $this->simulatorForm->getState();
@@ -164,10 +153,8 @@ trait ManagesInboundSimulator
             attachments: []
         );
 
-        // Dispatch real inbound processing job
         ProcessInboundEmailJob::dispatch($dto);
 
-        // Close Modal
         $this->dispatch('close-modal', id: 'inbound-simulator-modal');
 
         Notification::make()

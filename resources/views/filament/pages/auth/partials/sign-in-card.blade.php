@@ -1,8 +1,8 @@
-<div class="mm-card">
+<div class="cad-card">
     <div>
-        <div class="mm-card-header">
-            <h2 class="mm-card-title">{{ $this->getHeading() }}</h2>
-            <p class="mm-card-subtitle">{{ $this->getSubheading() }}</p>
+        <div class="cad-card-header">
+            <h2 class="cad-card-title">{{ $this->getHeading() }}</h2>
+            <p class="cad-card-subtitle">{{ $this->getSubheading() }}</p>
         </div>
 
         <form wire:submit="authenticate" class="space-y-6">

@@ -37,26 +37,25 @@ class DraftAiResponseJob implements ShouldQueue
             ->pluck('property')
             ->toArray();
 
-        // 1. DUPLICATE PREVENTION: Delete any existing drafts for this thread before creating a new one.
+        // 1. DUPLICATE PREVENTION
         Message::where('thread_id', $this->thread->id)->where('is_draft', true)->delete();
 
-        // 2. EXISTENTIAL PERSONA CHECK: Decoupled from manual CRM statuses.
-        // Check if any other thread exists for this client that was created BEFORE the current thread.
+        // 2. EXISTENTIAL PERSONA CHECK
         $hasPriorInteractions = Thread::where('client_id', $this->thread->client_id)
             ->where('id', '<', $this->thread->id)
             ->exists();
 
         $isNewClient = ! $hasPriorInteractions;
 
-        // 3. DYNAMIC PERSONA INSTRUCTION
+        // 3. DYNAMIC PERSONA INSTRUCTION (👈 Rebranded to Cadastre Private Office)
         $personaInstruction = $isNewClient
-            ? "CLIENT RELATIONSHIP: FIRST-TIME INQUIRY.\n- You must include a warm, highly professional opening sentence introducing the client to 'MatchMaker Agency'.\n- Introduce our mission briefly before addressing their property preferences."
-            : "CLIENT RELATIONSHIP: RETURNING CLIENT.\n- DO NOT introduce 'MatchMaker Agency'.\n- DO NOT use introductory onboarding formulas.\n- Treat this as an ongoing business relationship. Transition immediately to their property query.";
+            ? "CLIENT RELATIONSHIP: FIRST-TIME INQUIRY.\n- You must include a warm, highly professional opening sentence introducing the client to 'Cadastre Private Office'.\n- Introduce our mission briefly before addressing their property preferences."
+            : "CLIENT RELATIONSHIP: RETURNING CLIENT.\n- DO NOT introduce 'Cadastre Private Office'.\n- DO NOT use introductory onboarding formulas.\n- Treat this as an ongoing business relationship. Transition immediately to their property query.";
 
         // 4. CONTEXT-AWARE SYSTEM INSTRUCTIONS
         $systemInstructions = "You are an elite, highly professional Real Estate Agent. Your goal is to be helpful, persuasive, and politely luxurious. ALWAYS reply in the exact same language the client used in their latest message.";
 
-        // 5. SMART PROMPT: Combine persona state with the core drafting logic.
+        // 5. SMART PROMPT
         $prompt = <<<TEXT
 {$personaInstruction}
 

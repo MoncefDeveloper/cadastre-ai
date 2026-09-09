@@ -17,8 +17,9 @@ class FaqSeeder extends Seeder
             // =========================================================================
             [
                 'id' => 1,
-                'question' => 'How does MatchMaker AI automatically match client inquiries to properties?',
-                'answer' => '<p>MatchMaker analyzes the natural language in incoming client emails via <strong>Google Gemini AI</strong>, extracts key parameters (budget, target city, bedroom count, property type), and computes real-time compatibility scores (85%–98%) against your active inventory.</p>',
+                // 👈 Rebranded to Cadastre AI
+                'question' => 'How does Cadastre AI automatically match client inquiries to properties?',
+                'answer' => '<p>Cadastre AI analyzes the natural language in incoming client emails via <strong>Google Gemini AI</strong>, extracts key parameters (budget, target city, bedroom count, property type), and computes real-time compatibility scores (85%–98%) against your active inventory.</p>',
                 'target_audience' => 'global',
                 'is_active' => true,
                 'sort_order' => 1,
@@ -38,7 +39,8 @@ class FaqSeeder extends Seeder
             [
                 'id' => 3,
                 'question' => 'How does the Fair Housing (FHA) compliance scoring engine protect agents?',
-                'answer' => '<p>Before any outbound email is dispatched, MatchMaker\'s advisory engine evaluates drafts against Fair Housing and anti-discrimination standards. Unless an agent holds the <code>bypass_compliance_gate</code> permission, drafts must achieve an approved compliance rating before sending.</p>',
+                // 👈 Rebranded to Cadastre AI's advisory engine
+                'answer' => '<p>Before any outbound email is dispatched, Cadastre AI\'s advisory engine evaluates drafts against Fair Housing and anti-discrimination standards. Unless an agent holds the <code>bypass_compliance_gate</code> permission, drafts must achieve an approved compliance rating before sending.</p>',
                 'target_audience' => 'agents',
                 'is_active' => true,
                 'sort_order' => 3,

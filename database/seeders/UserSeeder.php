@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
             [
                 'id' => 1,
                 'name' => (string) env('SUPER_ADMIN_NAME', 'Moncef Dev'),
-                'email' => (string) env('SUPER_ADMIN_EMAIL', 'matchmaker@moncefdev.me'),
+                'email' => (string) env('SUPER_ADMIN_EMAIL', 'cadastre@moncefdev.me'),
                 'password' => Hash::make((string) env('SUPER_ADMIN_PASSWORD', 'moncefdev')),
                 'is_active' => true,
                 'role' => 'super_admin',
@@ -26,55 +26,55 @@ class UserSeeder extends Seeder
             [
                 'id' => 2,
                 'name' => 'Admin Demo',
-                'email' => 'admin@matchmaker.test',
+                'email' => 'admin@cadastre.test', // 👈 Updated
                 'password' => Hash::make('password'),
                 'is_active' => true,
-                'role' => 'Admin', // Exact match with ShieldSeeder
+                'role' => 'Admin',
             ],
             // 3. Demo Manager
             [
                 'id' => 3,
                 'name' => 'Manager Demo',
-                'email' => 'manager@matchmaker.test',
+                'email' => 'manager@cadastre.test', // 👈 Updated
                 'password' => Hash::make('password'),
                 'is_active' => true,
-                'role' => 'Broker Manager', // Exact match with ShieldSeeder
+                'role' => 'Broker Manager',
             ],
             // 4. Demo Agent
             [
                 'id' => 4,
                 'name' => 'Agent Demo',
-                'email' => 'agent@matchmaker.test',
+                'email' => 'agent@cadastre.test', // 👈 Updated
                 'password' => Hash::make('password'),
                 'is_active' => true,
-                'role' => 'Senior Agent', // Exact match with ShieldSeeder
+                'role' => 'Senior Agent',
             ],
             // 5. Demo Guest
             [
                 'id' => 5,
                 'name' => 'Guest Demo',
-                'email' => 'guest@matchmaker.test',
+                'email' => 'guest@cadastre.test', // 👈 Updated
                 'password' => Hash::make('password'),
                 'is_active' => true,
-                'role' => 'Guest Viewer', // Exact match with ShieldSeeder
+                'role' => 'Guest Viewer',
             ],
             // 6. Moncef Ross (Listing Lead)
             [
                 'id' => 6,
                 'name' => 'Moncef Ross',
-                'email' => 'listings@matchmaker.test',
+                'email' => 'listings@cadastre.test', // 👈 Updated
                 'password' => Hash::make('password'),
                 'is_active' => true,
-                'role' => 'Listing Specialist', // Exact match with ShieldSeeder
+                'role' => 'Listing Specialist',
             ],
             // 7. Sarah Rostova (Auditor)
             [
                 'id' => 7,
                 'name' => 'Sarah Rostova',
-                'email' => 'auditor@matchmaker.test',
+                'email' => 'auditor@cadastre.test', // 👈 Updated
                 'password' => Hash::make('password'),
                 'is_active' => true,
-                'role' => 'Compliance Auditor', // Exact match with ShieldSeeder
+                'role' => 'Compliance Auditor',
             ],
         ];
 

@@ -36,10 +36,7 @@
             </div>
 
             <!-- DESKTOP ACTIONS (>= 1280px) -->
-            <!-- DESKTOP ACTIONS (>= 1280px) — Fully Unified Neutral & Primary Styling -->
             <div class="hidden xl:flex items-center gap-2 shrink-0 ml-4">
-
-                <!-- 1. Unread Button -->
                 <button
                     type="button"
                     wire:click="markAsUnread"
@@ -48,7 +45,6 @@
                     <span>Unread</span>
                 </button>
 
-                <!-- 2. AI Button -->
                 <button
                     type="button"
                     @click="aiBrainOpen = true; aiBrainTab = 'ai'"
@@ -58,7 +54,6 @@
                     <span>AI</span>
                 </button>
 
-                <!-- 3. Client Info Button -->
                 <button
                     type="button"
                     @click="aiBrainOpen = true; aiBrainTab = 'info'"
@@ -67,7 +62,6 @@
                     <x-heroicon-o-user class="w-4 h-4 text-gray-400 group-hover:text-primary-500 transition-colors" />
                 </button>
 
-                <!-- 4. 👋 Waving Hand Guide Trigger -->
                 <button
                     type="button"
                     @click="$dispatch('open-modal', { id: 'sandbox-welcome-modal' })"
@@ -75,13 +69,11 @@
                     title="Testing Guide & Sandbox Architecture">
                     <x-heroicon-o-hand-raised class="w-4 h-4 text-amber-500 animate-waving-hand group-hover:scale-110" />
 
-                    <!-- Subtle Pulsing Live Indicator -->
                     <span class="absolute -top-0.5 -right-0.5 flex h-2 w-2">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
                     </span>
                 </button>
-
             </div>
 
             <!-- RESPONSIVE MOBILE DROPDOWN (< 1280px) -->
@@ -108,7 +100,7 @@
             </div>
         </div>
 
-        <!-- Chat History (Email Cards) -->
+        <!-- Chat History (Email Cards with Shadow DOM Boundary) -->
         <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/50 dark:bg-[#0f1115]">
             @foreach($this->activeThread()->messages as $message)
             @if($message->is_draft) @continue @endif
@@ -134,6 +126,8 @@
                     </div>
                     <div class="text-xs text-gray-400 whitespace-nowrap">{{ $message->created_at->format('M d, g:i A') }}</div>
                 </div>
+
+                <!-- Mandatory Shadow DOM Container -->
                 <div class="p-5 text-sm text-gray-700 dark:text-gray-300 w-full overflow-hidden"
                     x-data="{ html: @js($message->body_html ?? nl2br(e($message->body_text))) }"
                     x-init="
@@ -158,7 +152,7 @@
             @endforeach
         </div>
 
-        <!-- Dynamic Border UI -->
+        <!-- Dynamic Border UI Composer -->
         <div
             x-data="{
                 composerHeight: null,
@@ -173,7 +167,6 @@
             "
             class="composer-container bg-white dark:bg-gray-900 shadow-[0_-4px_10px_rgba(0,0,0,0.02)] flex flex-col relative shrink-0 overflow-hidden {{ !$ratingResult ? 'border-t border-gray-200 dark:border-white/10' : 'rounded-b-xl' }}">
 
-            <!-- 🔄 Blocking & Loading Overlay (Triggers from BOTH native click and toast notification) -->
             <div
                 x-show="isAuditing"
                 x-cloak
@@ -227,7 +220,7 @@
                             View Rules
                         </x-filament::button>
 
-                        <!-- 2. Evaluation Button with High-Contrast Dynamic Badge -->
+                        <!-- 2. Evaluation Button -->
                         <x-filament::button
                             outlined
                             size="xs"
@@ -295,7 +288,6 @@
             </x-slot>
 
             <div class="space-y-6">
-                <!-- Compliance Alert -->
                 @if(!$ratingResult['is_compliant'])
                 <div class="p-4 rounded-xl bg-danger-50 dark:bg-danger-900/20 border border-danger-200 dark:border-danger-900/50">
                     <div class="flex gap-3">
@@ -315,7 +307,6 @@
                 </div>
                 @endif
 
-                <!-- Critique Section -->
                 <div>
                     <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Editor's Critique</h4>
                     <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed italic border-l-2 border-gray-300 dark:border-gray-600 pl-4">
@@ -323,7 +314,6 @@
                     </p>
                 </div>
 
-                <!-- Summary Section -->
                 <div>
                     <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Summary</h4>
                     <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-white/5 p-4 rounded-xl border border-gray-200 dark:border-white/10">
@@ -338,7 +328,6 @@
                         Close
                     </x-filament::button>
 
-                    <!-- 🧠 Instant jump to AI Insights when a draft fails -->
                     <x-filament::button
                         color="primary"
                         icon="heroicon-m-sparkles"
@@ -351,7 +340,7 @@
             @endif
         </x-filament::modal>
 
-        <!-- THE EXPLANATORY MODAL (SSOT RULES DISPLAY) -->
+        <!-- THE EXPLANATORY MODAL (Cadastre Rules Display) -->
         <x-filament::modal id="compliance-rules-modal" width="3xl" slide-over>
             <x-slot name="heading">
                 Compliance & Quality Rules
@@ -361,7 +350,8 @@
             </x-slot>
 
             <div class="space-y-4 pr-2 pb-6">
-                @foreach(config('matchmaker-rules', []) as $section)
+                <!-- 👈 Updated from matchmaker-rules to cadastre-rules -->
+                @foreach(config('cadastre-rules', []) as $section)
                 <x-filament::section icon="heroicon-o-shield-check" collapsible>
                     <x-slot name="heading">
                         {{ $section['title'] }}

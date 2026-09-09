@@ -90,7 +90,8 @@ TEXT;
             'price' => '$' . number_format($p['price'] / 100, 2),
             'city' => $p['city'],
             'specs' => "{$p['bedrooms']} Beds, {$p['bathrooms']} Baths",
-            'link' => "https://matchmaker.com/properties/{$p['slug']}"
+            // 👈 Updated to Cadastre domain
+            'link' => rtrim(config('app.url', 'https://cadastre.ai'), '/') . "/properties/{$p['slug']}"
         ], $properties), JSON_PRETTY_PRINT);
 
         // Strict HTML rules injected into system instructions
@@ -118,9 +119,6 @@ TEXT;
         return $this->cleanHtmlOutput($rawDraft);
     }
 
-    /**
-     * Called by the AiModifier to adjust an existing draft.
-     */
     public function modifyDraft(string $currentDraftHtml, string $modifierInstruction): string
     {
         $systemInstruction = "You are an elite real estate copywriter. Modify the provided HTML email draft exactly as the user instructs. CRITICAL RULES: 1) Return ONLY pure, semantic HTML. 2) Maintain existing links. 3) DO NOT change the language of the original draft unless explicitly told to translate it.";
@@ -132,7 +130,7 @@ TEXT;
                 'systemInstruction' => ['parts' => [['text' => $systemInstruction]]],
                 'contents' => [['role' => 'user', 'parts' => [['text' => $userPrompt]]]],
                 'generationConfig' => [
-                    'temperature' => 0.5, // Lower temp for exact modifications
+                    'temperature' => 0.5,
                     'thinkingConfig' => ['thinkingLevel' => 'high']
                 ],
             ]);
@@ -145,16 +143,9 @@ TEXT;
         return $this->cleanHtmlOutput($rawDraft);
     }
 
-    /**
-     * Sanitizes the output, stripping backticks and enforcing UI safety.
-     */
     private function cleanHtmlOutput(string $html): string
     {
-        // 1. Strip markdown code block wrappers
         $html = trim(str_replace(['```html', '```'], '', $html));
-
-        // 2. Aggressively strip inline style="" and class="" attributes using RegEx
-        // This ensures the AI can't accidentally inject colors that break Dark Mode.
         $html = preg_replace('/(style|class)="[^"]*"/i', '', $html);
 
         return trim($html);
@@ -162,7 +153,8 @@ TEXT;
 
     public function evaluateDraftComplianceAndQuality(string $threadHistory, string $proposedDraft): array
     {
-        $rulesConfig = config('matchmaker-rules', []);
+        // 👈 Updated to cadastre-rules config
+        $rulesConfig = config('cadastre-rules', []);
         $compiledRules = '';
 
         foreach ($rulesConfig as $section) {
@@ -197,18 +189,18 @@ TEXT;
 
         $userPrompt = "THREAD HISTORY:\n{$threadHistory}\n\nPROPOSED DRAFT:\n{$proposedDraft}";
 
-        $response = \Illuminate\Support\Facades\Http::withoutVerifying()->timeout(30)
+        $response = Http::withoutVerifying()->timeout(30)
             ->post(self::API_URL . self::MODEL . ':generateContent?key=' . $this->getApiKey(), [
                 'systemInstruction' => ['parts' => [['text' => $systemInstruction]]],
                 'contents' => [['role' => 'user', 'parts' => [['text' => $userPrompt]]]],
                 'generationConfig' => [
                     'responseMimeType' => 'application/json',
-                    'temperature' => 0.1, // Strict logic required for compliance grading
+                    'temperature' => 0.1,
                 ],
             ]);
 
         if (!$response->successful()) {
-            throw new \Exception("Gemini Compliance Error: " . $response->body());
+            throw new Exception("Gemini Compliance Error: " . $response->body());
         }
 
         $jsonString = $response->json('candidates.0.content.parts.0.text') ?? '{}';

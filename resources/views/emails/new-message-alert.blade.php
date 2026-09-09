@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="x-apple-disable-message-reformatting">
-    <title>MatchMaker Inbox Alert</title>
+    <title>Cadastre AI Inbox Alert</title>
     <!--[if mso]>
     <style>
         table {border-collapse:collapse;border-spacing:0;border:none;margin:0;}
@@ -27,11 +27,11 @@
                 <td align="center">
                     <table class="main" style="margin:0 auto;width:100%;max-width:600px;border-spacing:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1e293b;" border="0" cellpadding="0" cellspacing="0">
 
-                        <!-- Header Logo Bar -->
+                        <!-- Header Logo Bar (👈 Updated to Imperial Carmine #BE123C) -->
                         <tr>
                             <td align="center" style="padding: 20px 0;">
                                 <h2 style="margin:0;font-size:24px;font-weight:800;letter-spacing:-0.5px;color:#0f172a;">
-                                    <span style="color:#f59e0b;">Match</span>Maker
+                                    <span style="color:#be123c;">Cadastre</span> AI
                                 </h2>
                             </td>
                         </tr>
@@ -50,7 +50,7 @@
                                 <!-- The Message Block (Quote Bubble) -->
                                 <table style="width:100%;border-spacing:0;" border="0" cellpadding="0" cellspacing="0">
                                     <tr>
-                                        <td style="padding: 16px 20px; background-color: #f1f5f9; border-left: 4px solid #4f46e5; border-radius: 0 8px 8px 0;">
+                                        <td style="padding: 16px 20px; background-color: #f1f5f9; border-left: 4px solid #be123c; border-radius: 0 8px 8px 0;">
                                             <p style="margin:0 0 8px 0;font-size:14px;font-weight:700;color:#0f172a;">
                                                 {{ $clientName }}
                                             </p>
@@ -65,7 +65,7 @@
                                 <table style="width:100%;border-spacing:0;margin-top:32px;" border="0" cellpadding="0" cellspacing="0">
                                     <tr>
                                         <td align="center">
-                                            <a href="{{ $url }}" style="background-color:#4f46e5;color:#ffffff;display:inline-block;font-size:16px;font-weight:600;line-height:50px;text-align:center;text-decoration:none;width:240px;border-radius:8px;box-shadow:0 4px 6px -1px rgba(79,70,229,0.2);">
+                                            <a href="{{ $url }}" style="background-color:#be123c;color:#ffffff;display:inline-block;font-size:16px;font-weight:600;line-height:50px;text-align:center;text-decoration:none;width:240px;border-radius:8px;box-shadow:0 4px 6px -1px rgba(190,18,60,0.25);">
                                                 Open Shared Inbox
                                             </a>
                                         </td>
@@ -79,7 +79,7 @@
                         <tr>
                             <td align="center" style="padding: 24px 32px;">
                                 <p style="margin:0 0 8px 0;font-size:12px;line-height:18px;color:#64748b;font-weight:600;">
-                                    MatchMaker AI CRM & Shared Inbox
+                                    Cadastre AI &bull; Autonomous Real Estate Intelligence
                                 </p>
                                 <p style="margin:0;font-size:12px;line-height:18px;color:#94a3b8;">
                                     This is an automated transactional security alert. <br>

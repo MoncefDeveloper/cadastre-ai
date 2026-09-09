@@ -18,11 +18,12 @@ class TemplateSeeder extends Seeder
             // =========================================================================
             [
                 'id' => 1,
-                'category_id' => 6, // Lead Inquiries & First Contact
+                'category_id' => 6,
                 'name' => 'VIP Lead Greeting & Curated Property Match',
                 'channel' => ThreadChannel::EMAIL,
                 'system_instructions' => 'You are an elite private real estate advisor. Maintain a sophisticated, warm, and highly professional tone. Highlight architectural pedigree, privacy, and investment stability.',
-                'prompt' => "Compose a personalized introduction email to {{client_name}}.\n\n1. Thank them for contacting MatchMaker Real Estate regarding their search in {{target_city}}.\n2. Present the curated property recommendation: {{property_title}}.\n3. Highlight key features: {{property_highlights}} and pricing at {{property_price}}.\n4. Conclude with a warm invitation for a confidential private consultation with {{agent_name}}.",
+                // 👈 Rebranded to Cadastre AI Real Estate
+                'prompt' => "Compose a personalized introduction email to {{client_name}}.\n\n1. Thank them for contacting Cadastre AI Real Estate regarding their search in {{target_city}}.\n2. Present the curated property recommendation: {{property_title}}.\n3. Highlight key features: {{property_highlights}} and pricing at {{property_price}}.\n4. Conclude with a warm invitation for a confidential private consultation with {{agent_name}}.",
                 'variables' => ['client_name', 'target_city', 'property_title', 'property_highlights', 'property_price', 'agent_name'],
                 'rules' => [
                     'tone' => 'luxury_persuasive',
@@ -51,11 +52,12 @@ class TemplateSeeder extends Seeder
             // =========================================================================
             [
                 'id' => 3,
-                'category_id' => 7, // Compliance & Legal Notices
+                'category_id' => 7,
                 'name' => 'Fair Housing & Regulatory Disclosure Notice',
                 'channel' => ThreadChannel::EMAIL,
                 'system_instructions' => 'You are an executive compliance counsel. Use precise, legally certified real estate terminology adhering strictly to Fair Housing Act guidelines with zero discriminatory language.',
-                'prompt' => "Generate the official regulatory disclosure and representation disclosure to {{client_name}} regarding {{property_title}}.\n\nState clearly that MatchMaker operates under Equal Housing Opportunity standards, reference Broker License #{{broker_license}}, and attach the statutory advisory disclosure.",
+                // 👈 Rebranded to Cadastre AI operates under Equal Housing Opportunity
+                'prompt' => "Generate the official regulatory disclosure and representation disclosure to {{client_name}} regarding {{property_title}}.\n\nState clearly that Cadastre AI operates under Equal Housing Opportunity standards, reference Broker License #{{broker_license}}, and attach the statutory advisory disclosure.",
                 'variables' => ['client_name', 'property_title', 'broker_license'],
                 'rules' => [
                     'compliance_gate' => 'mandatory',
@@ -133,7 +135,8 @@ class TemplateSeeder extends Seeder
                 'name' => 'Webform Instant Lead Auto-Acknowledgment',
                 'channel' => ThreadChannel::WEBFORM,
                 'system_instructions' => 'Automated luxury CRM response engine. Reassure the client that their inquiry is being reviewed by a dedicated private client advisor.',
-                'prompt' => "Generate an automated web confirmation for {{client_name}} thanking them for registering on the MatchMaker luxury portal regarding {{inquiry_topic}}.\n\nState that senior agent {{agent_name}} will review their criteria and send tailored options within 2 hours.",
+                // 👈 Rebranded to Cadastre AI luxury portal
+                'prompt' => "Generate an automated web confirmation for {{client_name}} thanking them for registering on the Cadastre AI luxury portal regarding {{inquiry_topic}}.\n\nState that senior agent {{agent_name}} will review their criteria and send tailored options within 2 hours.",
                 'variables' => ['client_name', 'inquiry_topic', 'agent_name'],
                 'rules' => [
                     'auto_dispatch' => 'true',
@@ -146,7 +149,7 @@ class TemplateSeeder extends Seeder
             // =========================================================================
             [
                 'id' => 9,
-                'category_id' => null, // Global Scope
+                'category_id' => null,
                 'name' => 'Stalled Deal Check-In & Price Adjustment Alert',
                 'channel' => ThreadChannel::EMAIL,
                 'system_instructions' => 'You are a senior relationship manager re-engaging a warm client. Focus on newly updated price points and market positioning.',
@@ -159,7 +162,7 @@ class TemplateSeeder extends Seeder
             ],
             [
                 'id' => 10,
-                'category_id' => null, // Global Scope
+                'category_id' => null,
                 'name' => 'Commercial Grade-A Lease Terms Summary',
                 'channel' => ThreadChannel::EMAIL,
                 'system_instructions' => 'You are a corporate commercial leasing director. Detail lease durations, fit-out periods, and utility infrastructure.',

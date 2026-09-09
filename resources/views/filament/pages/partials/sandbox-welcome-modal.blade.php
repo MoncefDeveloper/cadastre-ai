@@ -1,9 +1,9 @@
 <div x-data="{
     init() {
-        if (! sessionStorage.getItem('mm_inbox_welcome_shown')) {
+        if (! sessionStorage.getItem('cadastre_welcome_shown')) {
             setTimeout(() => {
                 $dispatch('open-modal', { id: 'sandbox-welcome-modal' });
-                sessionStorage.setItem('mm_inbox_welcome_shown', 'true');
+                sessionStorage.setItem('cadastre_welcome_shown', 'true');
             }, 5000);
         }
     }
@@ -15,7 +15,7 @@
                     <x-heroicon-m-sparkles class="w-5 h-5" />
                 </div>
                 <div>
-                    <span class="font-bold text-lg text-gray-900 dark:text-white">Welcome to AI Shared Inbox</span>
+                    <span class="font-bold text-lg text-gray-900 dark:text-white">Welcome to Cadastre AI Shared Inbox</span>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Sandbox Architecture & Evaluator Testing Guide</p>
                 </div>
             </div>

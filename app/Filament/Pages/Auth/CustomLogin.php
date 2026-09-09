@@ -14,7 +14,7 @@ class CustomLogin extends BaseLogin
 
     public function getTitle(): string | Htmlable
     {
-        return 'Sign In to MatchMaker';
+        return 'Sign In to Cadastre AI';
     }
 
     public function getHeading(): string | Htmlable
@@ -38,7 +38,7 @@ class CustomLogin extends BaseLogin
             [
                 'key' => 'super_admin',
                 'role' => 'Admin',
-                'email' => 'admin@matchmaker.test',
+                'email' => 'admin@cadastre.test',
                 'color' => 'danger',
                 'icon' => 'heroicon-m-shield-check',
                 'icon_o' => 'heroicon-o-shield-check',
@@ -47,7 +47,7 @@ class CustomLogin extends BaseLogin
             [
                 'key' => 'broker_manager',
                 'role' => 'Manager',
-                'email' => 'manager@matchmaker.test',
+                'email' => 'manager@cadastre.test',
                 'color' => 'info',
                 'icon' => 'heroicon-m-briefcase',
                 'icon_o' => 'heroicon-o-briefcase',
@@ -56,7 +56,7 @@ class CustomLogin extends BaseLogin
             [
                 'key' => 'agent',
                 'role' => 'Agent',
-                'email' => 'agent@matchmaker.test',
+                'email' => 'agent@cadastre.test',
                 'color' => 'success',
                 'icon' => 'heroicon-m-user-group',
                 'icon_o' => 'heroicon-o-user-group',
@@ -65,7 +65,7 @@ class CustomLogin extends BaseLogin
             [
                 'key' => 'guest',
                 'role' => 'Guest',
-                'email' => 'guest@matchmaker.test',
+                'email' => 'guest@cadastre.test',
                 'color' => 'gray',
                 'icon' => 'heroicon-m-user',
                 'icon_o' => 'heroicon-o-user',
@@ -84,7 +84,7 @@ class CustomLogin extends BaseLogin
         return [
             'super_admin' => [
                 'title' => 'Admin',
-                'email' => 'admin@matchmaker.test',
+                'email' => 'admin@cadastre.test',
                 'color' => 'danger',
                 'icon' => 'heroicon-o-shield-check',
                 'badge' => 'Platform Owner',
@@ -114,7 +114,7 @@ class CustomLogin extends BaseLogin
             ],
             'broker_manager' => [
                 'title' => 'Manager',
-                'email' => 'manager@matchmaker.test',
+                'email' => 'manager@cadastre.test',
                 'color' => 'info',
                 'icon' => 'heroicon-o-briefcase',
                 'badge' => 'Compliance Director',
@@ -144,7 +144,7 @@ class CustomLogin extends BaseLogin
             ],
             'agent' => [
                 'title' => 'Agent',
-                'email' => 'agent@matchmaker.test',
+                'email' => 'agent@cadastre.test',
                 'color' => 'success',
                 'icon' => 'heroicon-o-user-group',
                 'badge' => 'Operational Agent',
@@ -174,7 +174,7 @@ class CustomLogin extends BaseLogin
             ],
             'guest' => [
                 'title' => 'Guest',
-                'email' => 'guest@matchmaker.test',
+                'email' => 'guest@cadastre.test',
                 'color' => 'gray',
                 'icon' => 'heroicon-o-user',
                 'badge' => 'Guest Observer',
@@ -202,9 +202,6 @@ class CustomLogin extends BaseLogin
         ];
     }
 
-    /**
-     * 1-Click Demo Login backend handler.
-     */
     public function quickLogin(string $email, string $password = 'password'): ?LoginResponse
     {
         $this->form->fill([
