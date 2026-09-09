@@ -22,7 +22,6 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -30,16 +29,64 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
+use UnitEnum;
 
 class CouponResource extends Resource
 {
     protected static ?string $model = Coupon::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTicket;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-ticket';
 
-    protected static ?int $navigationSort = 3;
+    protected static string|BackedEnum|null $activeNavigationIcon = 'heroicon-s-ticket';
 
+    protected static ?string $navigationLabel = 'Coupons';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Commercial';
+
+    protected static ?int $navigationSort = 2;
+
+    /*
+     |----------------------------------------------------------------------
+     | Global Search Configuration (Voucher Codes Lookup)
+     |----------------------------------------------------------------------
+     */
     protected static ?string $recordTitleAttribute = 'code';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['code'];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        /** @var Coupon $record */
+        $discount = $record->type === 'percentage'
+            ? "{$record->value}%"
+            : Number::currency($record->value / 100, in: $record->currency ?? 'USD');
+
+        return [
+            'Discount' => $discount,
+            'Redeemed' => "{$record->use_count} / " . ($record->limit_uses ?? '∞'),
+            'Status'   => $record->isValid() ? 'Valid' : 'Expired/Inactive',
+        ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        $count = Coupon::where('is_active', true)->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Active discount vouchers and checkout promos';
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -47,7 +94,6 @@ class CouponResource extends Resource
             ->components([
                 Section::make('Coupon Configuration')
                     ->headerActions([
-                        // ⚡ Quick Fill Action (100% Non-destructive)
                         Action::make('quickFill')
                             ->label('⚡ Quick Fill')
                             ->icon('heroicon-m-sparkles')
@@ -90,7 +136,7 @@ class CouponResource extends Resource
                             ->default('percentage')
                             ->required()
                             ->inline()
-                            ->live() // Triggers reactivity for the Value/Currency fields
+                            ->live()
                             ->columnSpanFull(),
 
                         TextInput::make('value')
@@ -205,7 +251,8 @@ class CouponResource extends Resource
             ])
             ->recordActions([
                 EditAction::make()
-                    ->slideOver(),
+                    ->slideOver()
+                    ->color('gray'),
                 DeleteAction::make(),
             ])
             ->toolbarActions([

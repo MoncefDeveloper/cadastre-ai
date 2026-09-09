@@ -8,6 +8,7 @@ use App\Enums\NotificationType;
 use BackedEnum;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\ToggleButtons;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -20,22 +21,43 @@ use Filament\Schemas\Schema;
 use Illuminate\Support\HtmlString;
 use UnitEnum;
 
-
 class NotificationSettings extends Page implements HasSchemas
 {
     use InteractsWithSchemas;
     use HasPageShield;
 
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-bell-alert';
-    protected static ?string $navigationLabel = 'Notification Settings';
-    protected static string | UnitEnum | null $navigationGroup = 'System';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-bell-alert';
+
+    protected static string|BackedEnum|null $activeNavigationIcon = 'heroicon-s-bell-alert';
+
+    protected static ?string $navigationLabel = 'Notifications';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Administration';
+
     protected static ?string $title = 'Notification Settings';
+
     protected static ?string $slug = 'notification-settings';
-    protected static ?int $navigationSort = 100;
+
+    protected static ?int $navigationSort = 3;
 
     protected string $view = 'filament.pages.notification-settings';
 
     public ?array $data = [];
+
+    public static function getNavigationBadge(): ?string
+    {
+        return 'Channels';
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'gray';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Configured notification dispatch and alert channels';
+    }
 
     public function mount(): void
     {
@@ -46,8 +68,8 @@ class NotificationSettings extends Page implements HasSchemas
             ['notification_type' => NotificationType::NEW_MESSAGE],
             [
                 'channel_database' => true,
-                'channel_mail' => false,
-                'channel_sms' => false,
+                'channel_mail'     => false,
+                'channel_sms'      => false,
                 'channel_whatsapp' => false,
             ]
         );
@@ -62,7 +84,6 @@ class NotificationSettings extends Page implements HasSchemas
     {
         return $schema
             ->components([
-                // 1. UNIFIED PARENT SECTION
                 Section::make('New Inbound Client Message')
                     ->description('Choose which channels are active when a client replies to an active thread.')
                     ->icon('heroicon-o-chat-bubble-left-ellipsis')
@@ -71,7 +92,6 @@ class NotificationSettings extends Page implements HasSchemas
                         Group::make()
                             ->statePath(NotificationType::NEW_MESSAGE->value)
                             ->schema([
-                                // 2. CARD-IN-CARD NESTING (Using the helper method below)
                                 $this->buildChannelCard(
                                     name: 'channel_database',
                                     title: 'In-App Notification',
@@ -100,44 +120,58 @@ class NotificationSettings extends Page implements HasSchemas
             ->statePath('data');
     }
 
-    private function buildChannelCard(string $name, string $title, string $description, bool $disabled = false): Section
-    {
-        // Define your mandatory core channels
-        $isMandatoryChannel = in_array($name, ['channel_database'], true);
 
-        // If it is mandatory AND the agent lacks the override permission, lock it
-        if ($isMandatoryChannel && ! auth()->user()->can('manage_mandatory_notification_channels')) {
-            $disabled = true;
-            $description = $description . ' (Mandatory Core Channel)';
-        }
+private function buildChannelCard(string $name, string $title, string $description, bool $disabled = false): Section
+{
+    $isMandatoryChannel = in_array($name, ['channel_database'], true);
 
-        return Section::make()
-            ->compact()
-            ->schema([
-                Grid::make(12)
-                    ->extraAttributes(['class' => 'items-center'])
-                    ->schema([
-                        TextEntry::make("{$name}_text")
-                            ->hiddenLabel()
-                            ->default($title)
-                            ->formatStateUsing(fn(): HtmlString => new HtmlString("
+    if ($isMandatoryChannel && ! auth()->user()->can('manage_mandatory_notification_channels')) {
+        $disabled = true;
+        $description = $description . ' (Mandatory Core Channel)';
+    }
+
+    return Section::make()
+        ->compact()
+        ->schema([
+            Grid::make(12)
+                ->extraAttributes(['class' => 'items-center'])
+                ->schema([
+                    // Title & Description (Left: 8 cols)
+                    TextEntry::make("{$name}_text")
+                        ->hiddenLabel()
+                        ->default($title)
+                        ->formatStateUsing(fn (): HtmlString => new HtmlString("
                             <div class=\"flex flex-col text-left\">
                                 <span class=\"text-sm font-bold text-gray-900 dark:text-white\">{$title}</span>
                                 <span class=\"text-xs text-gray-500 dark:text-gray-400 mt-0.5\">{$description}</span>
                             </div>
                         "))
-                            ->columnSpan(['default' => 12, 'sm' => 11]),
+                        ->columnSpan(['default' => 12, 'sm' => 8, 'md' => 9]),
 
-                        Toggle::make($name)
-                            ->hiddenLabel()
-                            ->disabled($disabled)
-                            // Force dehydration so the disabled true state is still sent to save()
-                            ->dehydrated(true)
-                            ->columnSpan(['default' => 12, 'sm' => 1])
-                            ->extraAttributes(['class' => 'flex sm:justify-end mt-2 sm:mt-0']),
-                    ]),
-            ]);
-    }
+                    // Explicit Segmented Control (Right: 4 cols)
+                    ToggleButtons::make($name)
+                        ->hiddenLabel()
+                        ->boolean()
+                        ->grouped() // 👈 Glues the two buttons into a single sleek segmented bar
+                        ->options([
+                            true  => 'Enabled',
+                            false => 'Disabled',
+                        ])
+                        ->icons([
+                            true  => 'heroicon-m-check',
+                            false => 'heroicon-m-x-mark',
+                        ])
+                        ->colors([
+                            true  => 'success',
+                            false => 'gray',
+                        ])
+                        ->disabled($disabled)
+                        ->dehydrated(true)
+                        ->columnSpan(['default' => 12, 'sm' => 4, 'md' => 3])
+                        ->extraFieldWrapperAttributes(['class' => 'flex sm:justify-end mt-2 sm:mt-0']),
+                ]),
+        ]);
+}
 
     public function save(): void
     {
@@ -148,8 +182,6 @@ class NotificationSettings extends Page implements HasSchemas
             $enumType = NotificationType::tryFrom($typeString);
 
             if ($enumType) {
-                // BACKEND SECURITY INTERCEPTOR:
-                // If they lack permission, override the array and force channel_database to true!
                 if (! $user->can('manage_mandatory_notification_channels')) {
                     $channels['channel_database'] = true;
                 }

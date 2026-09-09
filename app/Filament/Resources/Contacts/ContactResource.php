@@ -24,21 +24,53 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
 
 class ContactResource extends Resource
 {
     protected static ?string $model = Contact::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedInboxArrowDown;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-bottom-center-text';
 
-    // protected static ?string $navigationGroup = 'SaaS Admin';
+    protected static string|BackedEnum|null $activeNavigationIcon = 'heroicon-s-chat-bubble-bottom-center-text';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?string $navigationLabel = 'Inquiries';
 
-    // Dynamically display the unread badge count in the sidebar!
+    protected static string|UnitEnum|null $navigationGroup = 'Client CRM';
+
+    protected static ?int $navigationSort = 2;
+
+    /*
+     |----------------------------------------------------------------------
+     | Global Search Configuration (Inbound Inquiries Lookup)
+     |----------------------------------------------------------------------
+     */
+    protected static ?string $recordTitleAttribute = 'subject';
+
+    public static function getGlobalSearchResultTitle(Model $record): string
+    {
+        /** @var Contact $record */
+        return $record->subject ?? "Inquiry from {$record->name}";
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'email', 'phone', 'subject'];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        /** @var Contact $record */
+        return [
+            'From'   => "{$record->name} ({$record->email})",
+            'Status' => $record->status->getLabel(),
+        ];
+    }
+
     public static function getNavigationBadge(): ?string
     {
         $count = Contact::where('status', ContactMessageStatus::Unread)->count();
+
         return $count > 0 ? (string) $count : null;
     }
 
@@ -47,13 +79,16 @@ class ContactResource extends Resource
         return 'danger';
     }
 
-    // Completely disable standard creation
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Unread webform messages awaiting response';
+    }
+
     public static function canCreate(): bool
     {
         return false;
     }
 
-    // The Form is ONLY used when clicking Edit to change the status
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -101,13 +136,12 @@ class ContactResource extends Resource
     {
         return $table
             ->checkIfRecordIsSelectableUsing(fn(Model $record): bool => ! method_exists($record, 'isBaselineRecord') || ! $record->isBaselineRecord() || auth()->id() === 1)
-            ->poll('15s') // Auto-refresh the inbox
+            ->poll('15s')
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('name')
                     ->searchable()
-                    ->description(fn(Contact $record): ?string => $record->subject) // Stack subject under name
-                    // Bolds the name if the message is unread
+                    ->description(fn(Contact $record): ?string => $record->subject)
                     ->weight(fn(Contact $record): string => $record->status === ContactMessageStatus::Unread ? 'bold' : 'normal'),
 
                 TextColumn::make('email')
@@ -115,7 +149,6 @@ class ContactResource extends Resource
                     ->copyable()
                     ->icon('heroicon-m-envelope'),
 
-                // Instant inline editing of the status directly from the table
                 SelectColumn::make('status')
                     ->options(ContactMessageStatus::class)
                     ->sortable()
@@ -134,7 +167,9 @@ class ContactResource extends Resource
                     ->default(ContactMessageStatus::Unread->value),
             ])
             ->recordActions([
-                ViewAction::make()->slideOver(), // Opens the beautiful Infolist
+                ViewAction::make()
+                    ->slideOver()
+                    ->color('gray'),
                 DeleteAction::make(),
             ])
             ->toolbarActions([

@@ -20,23 +20,65 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
 
 class FaqResource extends Resource
 {
     protected static ?string $model = Faq::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedQuestionMarkCircle;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-question-mark-circle';
 
-    protected static ?int $navigationSort = 2;
+    protected static string|BackedEnum|null $activeNavigationIcon = 'heroicon-s-question-mark-circle';
 
+    protected static ?string $navigationLabel = 'FAQs';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Commercial';
+
+    protected static ?int $navigationSort = 3;
+
+    /*
+     |----------------------------------------------------------------------
+     | Global Search Configuration (Knowledge Base Lookup)
+     |----------------------------------------------------------------------
+     */
     protected static ?string $recordTitleAttribute = 'question';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['question', 'answer'];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        /** @var Faq $record */
+        return [
+            'Audience' => ucfirst($record->target_audience ?? 'global'),
+            'Status'   => $record->is_active ? 'Visible' : 'Hidden',
+        ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        $count = Faq::where('is_active', true)->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'gray';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Published knowledge base and onboarding answers';
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -44,7 +86,6 @@ class FaqResource extends Resource
             ->components([
                 Section::make('Question Details')
                     ->headerActions([
-                        // ⚡ Quick Fill Action (100% Non-destructive)
                         Action::make('quickFill')
                             ->label('⚡ Quick Fill')
                             ->icon('heroicon-m-sparkles')
@@ -143,8 +184,8 @@ class FaqResource extends Resource
             ->recordActions([
                 EditAction::make()
                     ->slideOver()
-                    ->color('gray'), // Quiet neutral link (illuminates to white on hover)
-                DeleteAction::make(), // Blazing Flame Vermilion (#F95428)
+                    ->color('gray'),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

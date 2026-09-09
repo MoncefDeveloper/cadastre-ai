@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Auth\CustomLogin;
+use App\Filament\Pages\Dashboard;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
+use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -79,7 +80,7 @@ class AdminPanelProvider extends PanelProvider
                     700 => '#c22c0b',
                     800 => '#9a240e',
                     900 => '#7c200f',
-                    950 => '#430d05',
+                    950 => '#4c0519',
                 ],
 
                 // 3. Cold Obsidian Gray Ramp (Canvas & Elevated Cards)
@@ -100,6 +101,19 @@ class AdminPanelProvider extends PanelProvider
                 'success' => Color::Emerald,
                 'warning' => Color::Amber,
                 'info'    => Color::Sky,
+            ])
+            /*
+             |----------------------------------------------------------------------
+             | Navigation Information Architecture (Clean Text Group Headers)
+             |----------------------------------------------------------------------
+             */
+            ->navigationGroups([
+                NavigationGroup::make('Portfolio'),
+                NavigationGroup::make('Client CRM'),
+                NavigationGroup::make('AI Copilot'),
+                NavigationGroup::make('Commercial'),
+                NavigationGroup::make('Administration')
+                    ->collapsed(true),
             ])
             // 🛡️ Positioned directly AFTER the search bar
             ->renderHook(
@@ -124,6 +138,7 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
+            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->plugins([
                 FilamentShieldPlugin::make()
                     ->gridColumns([

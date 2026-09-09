@@ -27,9 +27,11 @@ use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
 use Override;
+use UnitEnum;
 
 class RoleResource extends Resource
 {
@@ -41,6 +43,81 @@ class RoleResource extends Resource
     use HasShieldFormComponents;
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shield-check';
+
+    protected static string|\BackedEnum|null $activeNavigationIcon = 'heroicon-s-shield-check';
+
+    protected static ?string $navigationLabel = 'Roles & Permissions';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Administration';
+
+    protected static ?int $navigationSort = 2;
+
+    /*
+     |----------------------------------------------------------------------
+     | Navigation Invariants (Explicit overrides for Shield's HasNavigation trait)
+     |----------------------------------------------------------------------
+     */
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Administration';
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return 'Roles & Permissions';
+    }
+
+    public static function getNavigationIcon(): string|\BackedEnum|null
+    {
+        return 'heroicon-o-shield-check';
+    }
+
+    public static function getActiveNavigationIcon(): string|\BackedEnum|null
+    {
+        return 'heroicon-s-shield-check';
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return 2;
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        $count = Utils::getRoleModel()::count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Configured Shield security roles and permission gates';
+    }
+
+    /*
+     |----------------------------------------------------------------------
+     | Global Search Configuration (Shield Role & Matrix Lookup)
+     |----------------------------------------------------------------------
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'guard_name'];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'Guard'       => $record->guard_name,
+            'Permissions' => $record->permissions()->count() . ' Granted',
+        ];
+    }
 
     #[Override]
     public static function form(Schema $schema): Schema
@@ -123,14 +200,14 @@ class RoleResource extends Resource
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->color('gray'),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
                 DeleteBulkAction::make(),
             ]);
     }
-
 
     #[Override]
     public static function getRelations(): array
@@ -140,15 +217,13 @@ class RoleResource extends Resource
         ];
     }
 
-
-
     public static function getPages(): array
     {
         return [
-            'index' => ListRoles::route('/'),
+            'index'  => ListRoles::route('/'),
             'create' => CreateRole::route('/create'),
-            'view' => ViewRole::route('/{record}'),
-            'edit' => EditRole::route('/{record}/edit'),
+            'view'   => ViewRole::route('/{record}'),
+            'edit'   => EditRole::route('/{record}/edit'),
         ];
     }
 
@@ -182,22 +257,22 @@ class RoleResource extends Resource
         ];
 
         // 2. Append the custom tab styled EXACTLY like the standard resource cards
-        $tabs[] = \Filament\Schemas\Components\Tabs\Tab::make('Custom Permissions') // Tab Label
+        $tabs[] = \Filament\Schemas\Components\Tabs\Tab::make('Custom Permissions')
             ->badge(count(config('filament-shield.custom_permissions', [])))
             ->schema([
-                Section::make('Inbox AI') // Card Title
-                    ->description('App\Filament\Pages\Inbox') // Model/Page class sub-description
+                Section::make('Inbox AI')
+                    ->description('App\Filament\Pages\Inbox')
                     ->collapsible()
                     ->compact()
                     ->schema([
                         CheckboxList::make('inbox_ai')
                             ->hiddenLabel()
                             ->options([
-                                'use_advanced_ai_modifiers' => 'Use Advanced AI Modifiers',
+                                'use_advanced_ai_modifiers'       => 'Use Advanced AI Modifiers',
                                 'apply_legally_binding_templates' => 'Apply Legally Binding Templates',
-                                'bypass_compliance_gate' => 'Bypass Compliance Gate',
+                                'bypass_compliance_gate'          => 'Bypass Compliance Gate',
                             ])
-                            ->formatStateUsing(function (?array $state, ?\Illuminate\Database\Eloquent\Model $record): array {
+                            ->formatStateUsing(function (?array $state, ?Model $record): array {
                                 if (! $record) {
                                     return [];
                                 }
@@ -212,7 +287,7 @@ class RoleResource extends Resource
                             })
                             ->columns([
                                 'default' => 1,
-                                'sm' => 2,
+                                'sm'      => 2,
                             ]),
                     ]),
                 Section::make('Property Inventory')
@@ -224,9 +299,9 @@ class RoleResource extends Resource
                             ->hiddenLabel()
                             ->options([
                                 'update_property_pricing' => 'Update Property Pricing',
-                                'reopen_closed_listings' => 'Reopen Closed Listings',
+                                'reopen_closed_listings'  => 'Reopen Closed Listings',
                             ])
-                            ->formatStateUsing(function (?array $state, ?\Illuminate\Database\Eloquent\Model $record): array {
+                            ->formatStateUsing(function (?array $state, ?Model $record): array {
                                 if (! $record) {
                                     return [];
                                 }
@@ -240,7 +315,7 @@ class RoleResource extends Resource
                             })
                             ->columns([
                                 'default' => 1,
-                                'sm' => 2,
+                                'sm'      => 2,
                             ]),
                     ]),
                 Section::make('User Security')
@@ -253,7 +328,7 @@ class RoleResource extends Resource
                             ->options([
                                 'force_logout_users' => 'Force Logout Users',
                             ])
-                            ->formatStateUsing(function (?array $state, ?\Illuminate\Database\Eloquent\Model $record): array {
+                            ->formatStateUsing(function (?array $state, ?Model $record): array {
                                 if (! $record) {
                                     return [];
                                 }
@@ -266,7 +341,7 @@ class RoleResource extends Resource
                             })
                             ->columns([
                                 'default' => 1,
-                                'sm' => 2,
+                                'sm'      => 2,
                             ]),
                     ]),
                 Section::make('AI Templates')
@@ -280,7 +355,7 @@ class RoleResource extends Resource
                                 'replicate_ai_templates' => 'Replicate AI Templates',
                                 'toggle_template_status' => 'Toggle Template Status',
                             ])
-                            ->formatStateUsing(function (?array $state, ?\Illuminate\Database\Eloquent\Model $record): array {
+                            ->formatStateUsing(function (?array $state, ?Model $record): array {
                                 if (! $record) {
                                     return [];
                                 }
@@ -294,7 +369,7 @@ class RoleResource extends Resource
                             })
                             ->columns([
                                 'default' => 1,
-                                'sm' => 2,
+                                'sm'      => 2,
                             ]),
                     ]),
                 Section::make('AI Modifiers')
@@ -306,9 +381,9 @@ class RoleResource extends Resource
                             ->hiddenLabel()
                             ->options([
                                 'manage_global_ai_modifiers' => 'Manage Global AI Modifiers',
-                                'toggle_modifier_status' => 'Toggle Modifier Status',
+                                'toggle_modifier_status'     => 'Toggle Modifier Status',
                             ])
-                            ->formatStateUsing(function (?array $state, ?\Illuminate\Database\Eloquent\Model $record): array {
+                            ->formatStateUsing(function (?array $state, ?Model $record): array {
                                 if (! $record) {
                                     return [];
                                 }
@@ -322,7 +397,7 @@ class RoleResource extends Resource
                             })
                             ->columns([
                                 'default' => 1,
-                                'sm' => 2,
+                                'sm'      => 2,
                             ]),
                     ]),
                 Section::make('SaaS Plans')
@@ -336,7 +411,7 @@ class RoleResource extends Resource
                                 'toggle_plan_status' => 'Toggle Plan Status',
                                 'feature_saas_plans' => 'Feature SaaS Plans',
                             ])
-                            ->formatStateUsing(function (?array $state, ?\Illuminate\Database\Eloquent\Model $record): array {
+                            ->formatStateUsing(function (?array $state, ?Model $record): array {
                                 if (! $record) {
                                     return [];
                                 }
@@ -350,7 +425,7 @@ class RoleResource extends Resource
                             })
                             ->columns([
                                 'default' => 1,
-                                'sm' => 2,
+                                'sm'      => 2,
                             ]),
                     ]),
                 Section::make('SaaS Coupons')
@@ -363,7 +438,7 @@ class RoleResource extends Resource
                             ->options([
                                 'toggle_coupon_status' => 'Toggle Coupon Status',
                             ])
-                            ->formatStateUsing(function (?array $state, ?\Illuminate\Database\Eloquent\Model $record): array {
+                            ->formatStateUsing(function (?array $state, ?Model $record): array {
                                 if (! $record) {
                                     return [];
                                 }
@@ -376,7 +451,7 @@ class RoleResource extends Resource
                             })
                             ->columns([
                                 'default' => 1,
-                                'sm' => 2,
+                                'sm'      => 2,
                             ]),
                     ]),
                 Section::make('Notification Channels')
@@ -389,7 +464,7 @@ class RoleResource extends Resource
                             ->options([
                                 'manage_mandatory_notification_channels' => 'Manage Mandatory Notification Channels',
                             ])
-                            ->formatStateUsing(function (?array $state, ?\Illuminate\Database\Eloquent\Model $record): array {
+                            ->formatStateUsing(function (?array $state, ?Model $record): array {
                                 if (! $record) {
                                     return [];
                                 }
@@ -402,7 +477,7 @@ class RoleResource extends Resource
                             })
                             ->columns([
                                 'default' => 1,
-                                'sm' => 2,
+                                'sm'      => 2,
                             ]),
                     ]),
             ])->columns(2);

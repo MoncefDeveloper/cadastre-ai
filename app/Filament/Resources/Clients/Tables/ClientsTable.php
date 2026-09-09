@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Clients\Tables;
 
 use Filament\Actions\BulkActionGroup;
@@ -21,7 +23,6 @@ class ClientsTable
                 TextColumn::make('email')->searchable()->copyable(),
                 TextColumn::make('phone')->searchable(),
 
-                // Because we use the Enum, Filament automatically pulls the Label and Color!
                 TextColumn::make('status')
                     ->badge()
                     ->sortable(),
@@ -31,7 +32,8 @@ class ClientsTable
             ])
             ->filters([])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->color('gray'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

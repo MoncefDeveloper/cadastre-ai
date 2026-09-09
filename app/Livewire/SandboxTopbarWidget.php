@@ -106,7 +106,7 @@ class SandboxTopbarWidget extends Component implements HasActions, HasSchemas
 
             $records = $query->get();
             $effectiveLimit = ($class === User::class && auth()->id() !== 1) ? $limit - 1 : $limit;
-            Log::info("Effective Limit: {$effectiveLimit}");
+            // Log::info("Effective Limit: {$effectiveLimit}");
 
             $baselineCount = 0;
             $modifiedCount = 0;

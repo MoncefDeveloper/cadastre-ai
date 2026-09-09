@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Properties;
 
+use App\Enums\Property\PropertyStatus;
 use App\Filament\Resources\Properties\Pages\CreateProperty;
 use App\Filament\Resources\Properties\Pages\EditProperty;
 use App\Filament\Resources\Properties\Pages\ListProperties;
@@ -12,14 +15,62 @@ use App\Models\Property;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
 
 class PropertyResource extends Resource
 {
     protected static ?string $model = Property::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-building-office-2';
+
+    protected static string|BackedEnum|null $activeNavigationIcon = 'heroicon-s-building-office-2';
+
+    protected static ?string $navigationLabel = 'Properties';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Portfolio';
+
+    protected static ?int $navigationSort = 1;
+
+    /*
+     |----------------------------------------------------------------------
+     | Global Search Configuration (Rich Spotlight Card)
+     |----------------------------------------------------------------------
+     */
+    protected static ?string $recordTitleAttribute = 'title';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title', 'city', 'address', 'slug'];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        /** @var Property $record */
+        return [
+            'City'   => $record->city,
+            'Price'  => '€' . number_format($record->price / 100),
+            'Status' => $record->status->getLabel(),
+        ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        $count = Property::where('status', PropertyStatus::AVAILABLE)->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Active and available properties on market';
+    }
 
     public static function form(Schema $schema): Schema
     {

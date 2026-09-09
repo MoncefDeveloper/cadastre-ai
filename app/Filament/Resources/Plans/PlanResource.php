@@ -7,7 +7,7 @@ namespace App\Filament\Resources\Plans;
 use App\Filament\Resources\Plans\Pages\ManagePlans;
 use App\Models\Plan;
 use BackedEnum;
-use Filament\Actions\Action; // 👈 Import Action
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -20,10 +20,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Utilities\Set; // 👈 Import Set Utility
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -31,16 +29,60 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
+use UnitEnum;
 
 class PlanResource extends Resource
 {
     protected static ?string $model = Plan::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCreditCard;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-credit-card';
+
+    protected static string|BackedEnum|null $activeNavigationIcon = 'heroicon-s-credit-card';
+
+    protected static ?string $navigationLabel = 'Plans';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Commercial';
 
     protected static ?int $navigationSort = 1;
 
+    /*
+     |----------------------------------------------------------------------
+     | Global Search Configuration (Subscription Packages Lookup)
+     |----------------------------------------------------------------------
+     */
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'slug', 'description'];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        /** @var Plan $record */
+        return [
+            'Monthly'  => Number::currency($record->price_monthly / 100, in: $record->currency ?? 'USD'),
+            'Status'   => $record->is_active ? 'Active' : 'Disabled',
+            'Featured' => $record->is_featured ? 'Yes' : 'No',
+        ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        $count = Plan::where('is_active', true)->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'info';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Published agency subscription packages';
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -49,7 +91,6 @@ class PlanResource extends Resource
                 // Stacked Section 1
                 Section::make('Core Details')
                     ->headerActions([
-                        // ⚡ Quick Fill Action (100% Non-destructive)
                         Action::make('quickFill')
                             ->label('Quick Fill')
                             ->icon('heroicon-m-sparkles')
@@ -217,7 +258,8 @@ class PlanResource extends Resource
             ])
             ->recordActions([
                 EditAction::make()
-                    ->slideOver(),
+                    ->slideOver()
+                    ->color('gray'),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
