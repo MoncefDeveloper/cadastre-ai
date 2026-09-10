@@ -1,0 +1,71 @@
+/* ==========================================================================
+   DARK MODE: Chassis, .fi-main & Active Sidebar Tab (oklch 258° Surface)
+   ========================================================================== */
+
+/* 1. Base Dark Chassis (Sidebar & Topbar Frame) */
+.dark body,
+.dark .fi-layout,
+.dark .fi-topbar,
+.dark .fi-sidebar {
+    background-color: #05070b !important;
+    border-right: none !important;
+}
+
+/* 2. Main Content Canvas (.fi-main) - Exact Match with Widget Cards */
+.dark .fi-main {
+    background-color: oklch(17.629% 0.01404 258.383 / 0.4) !important;
+    border: 1px solid rgba(245, 182, 182, 0.07) !important;
+    border-radius: 1.25rem !important;
+    margin-top: 0.5rem !important;
+    margin-bottom: 1rem !important;
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6) !important;
+    min-height: calc(100vh - 4.5rem) !important;
+    border-top-right-radius: 0rem !important;
+    border-bottom-right-radius: 0rem !important;
+
+}
+
+/* 3. Active Sidebar Tab Pill (Matching Elevated oklch Surface) */
+.dark .fi-sidebar-item-active a,
+.dark .fi-sidebar-item.fi-active a,
+.dark .fi-sidebar-item-active .fi-sidebar-item-button {
+    background-color: oklch(0.176 0.014 258.357) !important;
+    /* 👈 Exact match with .fi-main & widgets */
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 0.75rem !important;
+}
+
+/* ==========================================================================
+   LIGHT MODE: Chassis, .fi-main & Active Sidebar Tab
+   ========================================================================== */
+
+/* 1. Base Light Chassis (Slate-100 Outer Shell) */
+html:not(.dark) body,
+html:not(.dark) .fi-layout,
+html:not(.dark) .fi-topbar,
+html:not(.dark) .fi-sidebar {
+    background-color: #f1f5f9 !important;
+    border-right: none !important;
+}
+
+/* 2. Main Content Canvas (Pure White Sheet on Slate-100) */
+html:not(.dark) .fi-main {
+    background-color: #ffffff60 !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 1.25rem !important;
+    border-top-right-radius: 0rem !important;
+    border-bottom-right-radius: 0rem !important;
+    margin-top: 0.5rem !important;
+    margin-bottom: 1rem !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04) !important;
+    min-height: calc(100vh - 4.5rem) !important;
+}
+
+/* 3. Active Sidebar Tab Pill (Pure White Elevated Card on Slate-100) */
+html:not(.dark) .fi-sidebar-item-active a,
+html:not(.dark) .fi-sidebar-item.fi-active a,
+html:not(.dark) .fi-sidebar-item-active .fi-sidebar-item-button {
+    background-color: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 0.75rem !important;
+}

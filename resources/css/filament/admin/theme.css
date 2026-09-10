@@ -1,5 +1,6 @@
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
 @import './pages/custom-login.css';
+@import './layout.css';
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
@@ -51,7 +52,7 @@ body,
     font-family: var(--font-sans) !important;
 }
 
-/* OpenType Tabular Figures: Prevents Price, Clock, and Metric Jitter */
+/* OpenType Tabular Figures: Prevents Metric Jitter */
 .fi-ta-cell,
 .fi-wi-stats-overview-stat-value,
 .font-mono {
@@ -59,28 +60,84 @@ body,
 }
 
 /* ==========================================================================
-   Obsidian Canvas & Elevated Surface Normalization
+   Global Header (Topbar) Reset
    ========================================================================== */
 
-/* 1. Base Dark Canvas */
-.dark body,
-.dark .fi-layout,
-.dark .fi-main {
-    background-color: #05070b !important;
+.fi-topbar {
+    border-bottom: none !important;
+    box-shadow: none !important;
 }
 
-/* 2. Elevated Dark Containers */
-.dark .fi-topbar,
-.dark .fi-sidebar {
-    background-color: #05070b !important;
+/* ==========================================================================
+   Universal App-Wide Scrollbars (5px Rounded Pill across all Views)
+   ========================================================================== */
+
+* {
+    scrollbar-width: thin;
 }
 
-/* 3. Hairline Borders across All Elevated Surfaces */
-.dark .fi-section,
-.dark .fi-wi-widget,
-.dark .fi-ta-ctn,
-.dark .fi-topbar,
-.dark .fi-sidebar,
-.dark .fi-modal-window {
-    border-color: rgba(255, 255, 255, 0.07) !important;
+/* 1. Dark Mode Global Scrollbar */
+html.dark *,
+.dark * {
+    scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.dark *::-webkit-scrollbar,
+html.dark *::-webkit-scrollbar {
+    width: 5px !important;
+    height: 5px !important;
+}
+
+.dark *::-webkit-scrollbar-track,
+html.dark *::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+.dark *::-webkit-scrollbar-thumb,
+html.dark *::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.18) !important;
+    border-radius: 9999px !important;
+}
+
+.dark *::-webkit-scrollbar-thumb:hover,
+html.dark *::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* 2. Light Mode Global Scrollbar */
+html:not(.dark) *,
+:root:not(.dark) * {
+    scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+}
+
+html:not(.dark) *::-webkit-scrollbar {
+    width: 5px !important;
+    height: 5px !important;
+}
+
+html:not(.dark) *::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+html:not(.dark) *::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.25) !important;
+    border-radius: 9999px !important;
+}
+
+html:not(.dark) *::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.45) !important;
+}
+
+/* ==========================================================================
+   Sidebar Left-Edge Scrollbar (Strictly Exclusive to Sidebar)
+   ========================================================================== */
+
+.fi-sidebar nav,
+.fi-sidebar-nav {
+    direction: rtl !important;
+}
+
+.fi-sidebar nav > *,
+.fi-sidebar-nav > * {
+    direction: ltr !important;
 }
