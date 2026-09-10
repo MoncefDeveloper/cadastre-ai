@@ -1,115 +1,21 @@
 /* ==========================================================================
-   Cadastre AI Custom Login - Dual-Card Theme & Animations
+   Cadastre AI - Dual Card Login Theme & Carmine Data Stream Animation
    ========================================================================== */
 
-/* Light Mode Variables */
 :root {
-    --cad-bg-page: #f8fafc;
-    --cad-bg-card: #ffffff;
-    --cad-border-card: #e2e8f0;
-    --cad-shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 10px -2px rgba(0, 0, 0, 0.02);
-    --cad-text-title: #05070b;
-    --cad-text-subtitle: #64748b;
-    --cad-bg-row: #ffffff;
-    --cad-bg-row-hover: #f1f5f9;
-    --cad-border-row: #e2e8f0;
-    --cad-border-row-hover: #cbd5e1;
-    --cad-shadow-row: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
-    --cad-shadow-row-hover: 0 4px 12px -2px rgba(0, 0, 0, 0.08);
-    --cad-text-role: #0f172a;
-    --cad-text-email: #64748b;
-    --cad-divider-border: #e2e8f0;
-    --cad-divider-text: #94a3b8;
-}
-
-/* Dark Mode Variables (Cold Obsidian Design System) */
-@media (prefers-color-scheme: dark) {
-    :root:not(.light) {
-        --cad-bg-page: #05070b;
-        --cad-bg-card: #0d1117;
-        --cad-border-card: rgba(255, 255, 255, 0.07);
-        --cad-shadow-card: 0 25px 40px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
-        --cad-text-title: #f8fafc;
-        --cad-text-subtitle: #94a3b8;
-        --cad-bg-row: rgba(255, 255, 255, 0.02);
-        --cad-bg-row-hover: rgba(255, 255, 255, 0.05);
-        --cad-border-row: rgba(255, 255, 255, 0.08);
-        --cad-border-row-hover: rgba(255, 255, 255, 0.16);
-        --cad-shadow-row: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
-        --cad-shadow-row-hover: 0 8px 20px -4px rgba(0, 0, 0, 0.5);
-        --cad-text-role: #f8fafc;
-        --cad-text-email: #94a3b8;
-        --cad-divider-border: rgba(255, 255, 255, 0.08);
-        --cad-divider-text: #64748b;
-    }
-}
-
-html.dark {
     --cad-bg-page: #05070b;
     --cad-bg-card: #0d1117;
-    --cad-border-card: rgba(255, 255, 255, 0.07);
-    --cad-shadow-card: 0 25px 40px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    --cad-border-card: rgba(255, 255, 255, 0.08);
+    --cad-shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.03);
     --cad-text-title: #f8fafc;
     --cad-text-subtitle: #94a3b8;
-    --cad-bg-row: rgba(255, 255, 255, 0.02);
+    --cad-bg-row: rgba(255, 255, 255, 0.025);
     --cad-bg-row-hover: rgba(255, 255, 255, 0.05);
-    --cad-border-row: rgba(255, 255, 255, 0.08);
-    --cad-border-row-hover: rgba(255, 255, 255, 0.16);
-    --cad-shadow-row: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
-    --cad-shadow-row-hover: 0 8px 20px -4px rgba(0, 0, 0, 0.5);
-    --cad-text-role: #f8fafc;
-    --cad-text-email: #94a3b8;
-    --cad-divider-border: rgba(255, 255, 255, 0.08);
-    --cad-divider-text: #64748b;
+    --cad-border-row: rgba(255, 255, 255, 0.06);
+    --cad-border-row-hover: rgba(255, 255, 255, 0.14);
 }
 
-/* ==========================================================================
-   Keyframe Animations
-   ========================================================================== */
-@-webkit-keyframes cadFadeInUp {
-    0% {
-        opacity: 0;
-        transform: translateY(20px) scale(0.985);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-@keyframes cadFadeInUp {
-    0% {
-        opacity: 0;
-        transform: translateY(20px) scale(0.985);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-/* Imperial Carmine Glow Pulse */
-@-webkit-keyframes cadGlowPulse {
-    0%, 100% {
-        box-shadow: 0 10px 25px -5px rgba(190, 18, 60, 0.35);
-    }
-    50% {
-        box-shadow: 0 14px 35px -3px rgba(190, 18, 60, 0.6);
-    }
-}
-
-@keyframes cadGlowPulse {
-    0%, 100% {
-        box-shadow: 0 10px 25px -5px rgba(190, 18, 60, 0.35);
-    }
-    50% {
-        box-shadow: 0 14px 35px -3px rgba(190, 18, 60, 0.6);
-    }
-}
-
-/* ==========================================================================
-   Layout Containers
-   ========================================================================== */
+/* Fullscreen Viewport Wrapper */
 .cad-auth-wrapper {
     position: fixed;
     inset: 0;
@@ -122,25 +28,116 @@ html.dark {
     padding: 2rem 1.5rem;
     box-sizing: border-box;
     font-family: var(--font-sans);
-    transition: background-color 0.3s ease;
 }
 
-.cad-auth-container {
+/* --------------------------------------------------------------------------
+   BACKGROUND ANIMATED DATA STREAM SVG (Zero-JS GPU CSS Architecture)
+   -------------------------------------------------------------------------- */
+.cad-bg-stream-container {
+    position: absolute;
+    inset: 0;
     width: 100%;
-    max-width: 900px;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.35;
+}
+
+.cad-bg-stream-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    -o-object-fit: cover;
+       object-fit: cover;
+}
+
+/* Static Laser Conduits in Imperial Carmine */
+.cad-stream-lines {
+    opacity: 0.08;
+}
+
+.cad-stream-line {
+    fill: #be123c;
+}
+
+/* Moving Telemetric Light Pulses */
+.cad-stream-lights {
+    opacity: 0.85;
+}
+
+.cad-light {
+    fill: #fb7185;
+    -webkit-filter: drop-shadow(0 0 6px rgba(190, 18, 60, 0.75));
+            filter: drop-shadow(0 0 6px rgba(190, 18, 60, 0.75));
+    will-change: transform;
+}
+
+/* GPU Keyframe Animations */
+@-webkit-keyframes cadStreamDown {
+    0% { transform: translateY(-1080px); }
+    100% { transform: translateY(1080px); }
+}
+@keyframes cadStreamDown {
+    0% { transform: translateY(-1080px); }
+    100% { transform: translateY(1080px); }
+}
+
+@-webkit-keyframes cadStreamUp {
+    0% { transform: translateY(1080px); }
+    100% { transform: translateY(-1080px); }
+}
+
+@keyframes cadStreamUp {
+    0% { transform: translateY(1080px); }
+    100% { transform: translateY(-1080px); }
+}
+
+/* Staggered Streams Downward */
+.cad-light-4  { -webkit-animation: cadStreamDown 12s linear infinite; animation: cadStreamDown 12s linear infinite; -webkit-animation-delay: -2s; animation-delay: -2s; }
+.cad-light-5  { -webkit-animation: cadStreamDown 16s linear infinite; animation: cadStreamDown 16s linear infinite; -webkit-animation-delay: -7s; animation-delay: -7s; }
+.cad-light-6  { -webkit-animation: cadStreamDown 9s  linear infinite; animation: cadStreamDown 9s  linear infinite; -webkit-animation-delay: -4s; animation-delay: -4s; }
+.cad-light-7  { -webkit-animation: cadStreamDown 14s linear infinite; animation: cadStreamDown 14s linear infinite; -webkit-animation-delay: -11s; animation-delay: -11s; }
+.cad-light-8  { -webkit-animation: cadStreamDown 18s linear infinite; animation: cadStreamDown 18s linear infinite; -webkit-animation-delay: -1s; animation-delay: -1s; }
+.cad-light-11 { -webkit-animation: cadStreamDown 10s linear infinite; animation: cadStreamDown 10s linear infinite; -webkit-animation-delay: -8s; animation-delay: -8s; }
+.cad-light-12 { -webkit-animation: cadStreamDown 13s linear infinite; animation: cadStreamDown 13s linear infinite; -webkit-animation-delay: -3s; animation-delay: -3s; }
+.cad-light-13 { -webkit-animation: cadStreamDown 8s  linear infinite; animation: cadStreamDown 8s  linear infinite; -webkit-animation-delay: -6s; animation-delay: -6s; }
+.cad-light-14 { -webkit-animation: cadStreamDown 15s linear infinite; animation: cadStreamDown 15s linear infinite; -webkit-animation-delay: -12s; animation-delay: -12s; }
+.cad-light-15 { -webkit-animation: cadStreamDown 11s linear infinite; animation: cadStreamDown 11s linear infinite; -webkit-animation-delay: -5s; animation-delay: -5s; }
+.cad-light-16 { -webkit-animation: cadStreamDown 17s linear infinite; animation: cadStreamDown 17s linear infinite; -webkit-animation-delay: -9s; animation-delay: -9s; }
+
+/* Staggered Streams Upward */
+.cad-light-1  { -webkit-animation: cadStreamUp 13s linear infinite; animation: cadStreamUp 13s linear infinite; -webkit-animation-delay: -4s; animation-delay: -4s; }
+.cad-light-2  { -webkit-animation: cadStreamUp 8s  linear infinite; animation: cadStreamUp 8s  linear infinite; -webkit-animation-delay: -1s; animation-delay: -1s; }
+.cad-light-3  { -webkit-animation: cadStreamUp 15s linear infinite; animation: cadStreamUp 15s linear infinite; -webkit-animation-delay: -9s; animation-delay: -9s; }
+.cad-light-9  { -webkit-animation: cadStreamUp 11s linear infinite; animation: cadStreamUp 11s linear infinite; -webkit-animation-delay: -6s; animation-delay: -6s; }
+.cad-light-10 { -webkit-animation: cadStreamUp 16s linear infinite; animation: cadStreamUp 16s linear infinite; -webkit-animation-delay: -3s; animation-delay: -3s; }
+.cad-light-17 { -webkit-animation: cadStreamUp 10s linear infinite; animation: cadStreamUp 10s linear infinite; -webkit-animation-delay: -7s; animation-delay: -7s; }
+
+@media (prefers-reduced-motion: reduce) {
+    .cad-light { -webkit-animation: none !important; animation: none !important; }
+}
+
+/* --------------------------------------------------------------------------
+   FOREGROUND CONTAINER (z-index: 10)
+   -------------------------------------------------------------------------- */
+.cad-auth-container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 960px;
     margin: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100%;
-    justify-content: flex-end;
-    padding-bottom: 2rem;
     gap: 1.5rem;
-    -webkit-animation: cadFadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    animation: cadFadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    -webkit-animation: cadFadeInUp 0.5s ease-out forwards;
+    animation: cadFadeInUp 0.5s ease-out forwards;
 }
 
-/* 50/50 Equal Dual Cards Grid */
+/* 50/50 Dual Cards Grid */
 .cad-auth-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -157,7 +154,7 @@ html.dark {
 
 /* Base Card */
 .cad-card {
-    background-color: var(--cad-bg-card);
+    background-color: #0d1117df;
     border-radius: 1.75rem;
     box-shadow: var(--cad-shadow-card);
     border: 1px solid var(--cad-border-card);
@@ -166,7 +163,6 @@ html.dark {
     flex-direction: column;
     justify-content: space-between;
     box-sizing: border-box;
-    transition: box-shadow 0.3s ease, border-color 0.3s ease;
     height: -webkit-max-content;
     height: -moz-max-content;
     height: max-content;
@@ -181,10 +177,6 @@ html.dark {
     font-size: 1.35rem;
     font-weight: 800;
     color: var(--cad-text-title);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
     margin: 0;
     letter-spacing: -0.02em;
 }
@@ -195,7 +187,7 @@ html.dark {
     margin-top: 0.35rem;
 }
 
-/* Top 2x2 Grid */
+/* 2x2 Grid */
 .cad-role-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -203,13 +195,13 @@ html.dark {
     margin-bottom: 1.5rem;
 }
 
-/* Subtle Text Divider */
+/* Divider */
 .cad-divider {
     display: flex;
     align-items: center;
     margin: 1.25rem 0 1rem 0;
-    color: var(--cad-divider-text);
-    font-size: 0.75rem;
+    color: #64748b;
+    font-size: 0.725rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -218,33 +210,29 @@ html.dark {
 .cad-divider::before, .cad-divider::after {
     content: '';
     flex: 1;
-    border-bottom: 1px solid var(--cad-divider-border);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .cad-divider span {
     padding: 0 0.75rem;
 }
 
-/* Glassmorphism Account Rows */
+/* Account Rows */
 .cad-account-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0.75rem 1rem;
     border-radius: 1rem;
-    background-color: transparent;
-    border: 2px solid var(--cad-border-row);
-    box-shadow: var(--cad-shadow-row);
+    background-color: var(--cad-bg-row);
+    border: 1px solid var(--cad-border-row);
     margin-bottom: 0.65rem;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
     transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .cad-account-row:hover {
     background-color: var(--cad-bg-row-hover);
     border-color: var(--cad-border-row-hover);
-    box-shadow: var(--cad-shadow-row-hover);
     transform: translateY(-2px);
 }
 
@@ -263,49 +251,31 @@ html.dark {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    transition: transform 0.2s ease;
-}
-
-.cad-account-row:hover .cad-account-icon {
-    transform: scale(1.08);
 }
 
 .cad-account-role {
     font-weight: 700;
     font-size: 0.875rem;
-    color: var(--cad-text-role);
+    color: var(--cad-text-title);
     line-height: 1.25;
 }
 
 .cad-account-email {
     font-size: 0.75rem;
-    color: var(--cad-text-email);
-    font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
+    color: var(--cad-text-subtitle);
+    font-family: var(--font-mono, ui-monospace, monospace);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     margin-top: 0.1rem;
 }
 
-@-webkit-keyframes cadWaveHand {
-    0%, 100% { transform: rotate(0deg); }
-    20% { transform: rotate(16deg); }
-    40% { transform: rotate(-10deg); }
-    60% { transform: rotate(14deg); }
-    80% { transform: rotate(-4deg); }
+@-webkit-keyframes cadFadeInUp {
+    0% { opacity: 0; transform: translateY(16px); }
+    100% { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes cadWaveHand {
-    0%, 100% { transform: rotate(0deg); }
-    20% { transform: rotate(16deg); }
-    40% { transform: rotate(-10deg); }
-    60% { transform: rotate(14deg); }
-    80% { transform: rotate(-4deg); }
-}
-
-.animate-waving-hand {
-    display: inline-block;
-    transform-origin: 70% 70%;
-    -webkit-animation: cadWaveHand 2.4s infinite ease-in-out;
-    animation: cadWaveHand 2.4s infinite ease-in-out;
+@keyframes cadFadeInUp {
+    0% { opacity: 0; transform: translateY(16px); }
+    100% { opacity: 1; transform: translateY(0); }
 }

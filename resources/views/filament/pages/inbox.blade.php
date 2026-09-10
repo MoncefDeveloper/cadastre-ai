@@ -30,7 +30,7 @@
     </style>
 
     <!-- App Container -->
- <div
+    <div
         x-data="{ sidebarOpen: true, aiBrainOpen: false, aiBrainTab: 'info' }"
         x-on:open-ai-tab.window="aiBrainOpen = true; aiBrainTab = 'ai'"
         class="flex w-full gap-4 h-[calc(100vh-8rem)] relative">

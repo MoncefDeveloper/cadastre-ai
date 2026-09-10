@@ -12,17 +12,17 @@ class CustomLogin extends BaseLogin
 {
     protected string $view = 'filament.pages.auth.custom-login';
 
-    public function getTitle(): string | Htmlable
+    public function getTitle(): string|Htmlable
     {
         return 'Sign In to Cadastre AI';
     }
 
-    public function getHeading(): string | Htmlable
+    public function getHeading(): string|Htmlable
     {
         return 'Sign In';
     }
 
-    public function getSubheading(): string | Htmlable | null
+    public function getSubheading(): string|Htmlable|null
     {
         return 'Enter your credentials to access your account';
     }
@@ -39,10 +39,10 @@ class CustomLogin extends BaseLogin
                 'key' => 'super_admin',
                 'role' => 'Admin',
                 'email' => 'admin@cadastre.test',
-                'color' => 'danger',
+                'color' => 'primary', // 👈 Replaced danger with primary
                 'icon' => 'heroicon-m-shield-check',
                 'icon_o' => 'heroicon-o-shield-check',
-                'icon_classes' => 'bg-danger-500/10 text-danger-600 dark:text-danger-400 border-danger-500/20 dark:border-danger-500/30',
+                'icon_classes' => 'bg-primary-500/10 text-primary-600 dark:text-primary-400 border-primary-500/20 dark:border-primary-500/30',
             ],
             [
                 'key' => 'broker_manager',
@@ -85,7 +85,7 @@ class CustomLogin extends BaseLogin
             'super_admin' => [
                 'title' => 'Admin',
                 'email' => 'admin@cadastre.test',
-                'color' => 'danger',
+                'color' => 'primary', // 👈 Replaced danger with primary
                 'icon' => 'heroicon-o-shield-check',
                 'badge' => 'Platform Owner',
                 'scope' => 'Holds global root authority. Intercepts all authorization gates via Shield boot checks with unrestricted CRUD and SaaS billing control.',
@@ -93,7 +93,7 @@ class CustomLogin extends BaseLogin
                     ['gate' => 'AI Compliance Bypass', 'status' => 'Granted', 'is_granted' => true, 'desc' => 'Can send drafts without FHA compliance checks'],
                     ['gate' => 'Property Price Override', 'status' => 'Granted', 'is_granted' => true, 'desc' => 'Can override price and discount price fields'],
                     ['gate' => 'Reopen Closed Listings', 'status' => 'Granted', 'is_granted' => true, 'desc' => 'Can change status of Sold / Rented properties'],
-                    ['gate' => 'Force Logout Users', 'status' => 'Granted', 'is_granted' => true, 'desc' => 'Can invalidate active sessions from users table'],
+                    ['gate' => 'Force Logout Users', 'status' => 'Granted', 'is_granted' => true, 'desc' => 'Can terminate user sessions from the users table'],
                     ['gate' => 'SaaS Plans & Coupons', 'status' => 'Granted', 'is_granted' => true, 'desc' => 'Full CRUD on marketing plans and coupon codes'],
                     ['gate' => 'Global AI Modifiers', 'status' => 'Granted', 'is_granted' => true, 'desc' => 'Can create, edit, and toggle global modifier shortcuts'],
                 ],
@@ -134,8 +134,8 @@ class CustomLogin extends BaseLogin
                     'Administration & Audits' => ['ViewAny:User', 'View:User', 'force_logout_users', 'View:NotificationSettings'],
                 ],
                 'matrix_comparison' => [
-                    ['feature' => 'SaaS Pricing & Coupons', 'capability' => 'Hidden / Blocked', 'color' => 'danger'],
-                    ['feature' => 'Shield Role Matrix', 'capability' => 'Hidden / Blocked', 'color' => 'danger'],
+                    ['feature' => 'SaaS Pricing & Coupons', 'capability' => 'Hidden / Blocked', 'color' => 'primary'], // 👈 Replaced danger with primary
+                    ['feature' => 'Shield Role Matrix', 'capability' => 'Hidden / Blocked', 'color' => 'primary'], // 👈 Replaced danger with primary
                     ['feature' => 'AI Compliance Bypass', 'capability' => 'Unrestricted', 'color' => 'success'],
                     ['feature' => 'Force Logout Sessions', 'capability' => 'Allowed', 'color' => 'success'],
                     ['feature' => 'Property Price Override', 'capability' => 'Allowed', 'color' => 'success'],
@@ -164,10 +164,10 @@ class CustomLogin extends BaseLogin
                     'Settings' => ['View:NotificationSettings'],
                 ],
                 'matrix_comparison' => [
-                    ['feature' => 'SaaS Pricing & Coupons', 'capability' => 'Hidden / Blocked', 'color' => 'danger'],
-                    ['feature' => 'Shield Role Matrix', 'capability' => 'Hidden / Blocked', 'color' => 'danger'],
-                    ['feature' => 'AI Compliance Bypass', 'capability' => 'Locked (Must Grade)', 'color' => 'danger'],
-                    ['feature' => 'Force Logout Sessions', 'capability' => 'Hidden / Blocked', 'color' => 'danger'],
+                    ['feature' => 'SaaS Pricing & Coupons', 'capability' => 'Hidden / Blocked', 'color' => 'primary'], // 👈 Replaced danger with primary
+                    ['feature' => 'Shield Role Matrix', 'capability' => 'Hidden / Blocked', 'color' => 'primary'], // 👈 Replaced danger with primary
+                    ['feature' => 'AI Compliance Bypass', 'capability' => 'Locked (Must Grade)', 'color' => 'primary'], // 👈 Replaced danger with primary
+                    ['feature' => 'Force Logout Sessions', 'capability' => 'Hidden / Blocked', 'color' => 'primary'], // 👈 Replaced danger with primary
                     ['feature' => 'Property Price Override', 'capability' => 'Read-Only (Locked)', 'color' => 'warning'],
                     ['feature' => 'Global AI Modifiers', 'capability' => 'Self-Created Only', 'color' => 'info'],
                 ],
@@ -191,12 +191,12 @@ class CustomLogin extends BaseLogin
                     'Read-Only Exploration' => ['View:Inbox', 'ViewAny:Property', 'View:Property', 'ViewAny:Client', 'View:Client', 'ViewAny:Contact', 'View:Contact', 'ViewAny:Faq', 'View:Faq', 'ViewAny:Category', 'View:Category', 'ViewAny:Template', 'View:Template', 'View:NotificationSettings'],
                 ],
                 'matrix_comparison' => [
-                    ['feature' => 'SaaS Pricing & Coupons', 'capability' => 'Hidden / Blocked', 'color' => 'danger'],
-                    ['feature' => 'Shield Role Matrix', 'capability' => 'Hidden / Blocked', 'color' => 'danger'],
-                    ['feature' => 'AI Compliance Bypass', 'capability' => 'Locked', 'color' => 'danger'],
-                    ['feature' => 'Force Logout Sessions', 'capability' => 'Hidden / Blocked', 'color' => 'danger'],
+                    ['feature' => 'SaaS Pricing & Coupons', 'capability' => 'Hidden / Blocked', 'color' => 'primary'], // 👈 Replaced danger with primary
+                    ['feature' => 'Shield Role Matrix', 'capability' => 'Hidden / Blocked', 'color' => 'primary'], // 👈 Replaced danger with primary
+                    ['feature' => 'AI Compliance Bypass', 'capability' => 'Locked', 'color' => 'primary'], // 👈 Replaced danger with primary
+                    ['feature' => 'Force Logout Sessions', 'capability' => 'Hidden / Blocked', 'color' => 'primary'], // 👈 Replaced danger with primary
                     ['feature' => 'Property Price Override', 'capability' => 'Read-Only (Locked)', 'color' => 'warning'],
-                    ['feature' => 'Create / Edit / Delete', 'capability' => 'All Blocked', 'color' => 'danger'],
+                    ['feature' => 'Create / Edit / Delete', 'capability' => 'All Blocked', 'color' => 'primary'], // 👈 Replaced danger with primary
                 ],
             ],
         ];

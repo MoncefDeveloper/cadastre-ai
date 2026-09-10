@@ -141,3 +141,28 @@ html:not(.dark) *::-webkit-scrollbar-thumb:hover {
 .fi-sidebar-nav > * {
     direction: ltr !important;
 }
+
+
+@-webkit-keyframes cadWaveHand {
+    0%, 100% { transform: rotate(0deg); }
+    20% { transform: rotate(16deg); }
+    40% { transform: rotate(-10deg); }
+    60% { transform: rotate(14deg); }
+    80% { transform: rotate(-4deg); }
+}
+
+@keyframes cadWaveHand {
+    0%, 100% { transform: rotate(0deg); }
+    20% { transform: rotate(16deg); }
+    40% { transform: rotate(-10deg); }
+    60% { transform: rotate(14deg); }
+    80% { transform: rotate(-4deg); }
+}
+
+.animate-waving-hand {
+    display: inline-block;
+    transform-origin: 70% 70%;
+    -webkit-animation: cadWaveHand 2.4s infinite ease-in-out;
+    animation: cadWaveHand 2.4s infinite ease-in-out;
+}
+

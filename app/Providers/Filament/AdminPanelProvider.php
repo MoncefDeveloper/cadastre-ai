@@ -49,7 +49,7 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(asset('images/cadastre-mark-favicon-dark.svg'))
             /*
              |----------------------------------------------------------------------
-             | Design System: Imperial Carmine, Flame Vermilion & Cold Obsidian
+             | Design System: Imperial Carmine, Signal Coral & Cold Obsidian
              |----------------------------------------------------------------------
              */
             ->colors([
@@ -68,20 +68,8 @@ class AdminPanelProvider extends PanelProvider
                     950 => '#3a0413',
                 ],
 
-                // 2. High-Alert Flame Vermilion (System Danger & Errors - 33° Optical Separation)
-                'danger' => [
-                    50  => '#fff7ed',
-                    100 => '#ffedd5',
-                    200 => '#fed7aa',
-                    300 => '#fdba74',
-                    400 => '#fb923c',
-                    500 => '#f95428', // Blazing Emergency Vermilion
-                    600 => '#ea3c12',
-                    700 => '#c22c0b',
-                    800 => '#9a240e',
-                    900 => '#7c200f',
-                    950 => '#4c0519',
-                ],
+                // 2. Signal Coral (Restored Danger & Errors)
+                'danger' => Color::Red,
 
                 // 3. Cold Obsidian Gray Ramp (Canvas & Elevated Cards)
                 'gray' => [
@@ -115,6 +103,7 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make('Administration')
                     ->collapsed(true),
             ])
+            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             // 🛡️ Positioned directly AFTER the search bar
             ->renderHook(
                 PanelsRenderHook::TOPBAR_LOGO_AFTER,
@@ -138,7 +127,6 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
-            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->plugins([
                 FilamentShieldPlugin::make()
                     ->gridColumns([

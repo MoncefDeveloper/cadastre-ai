@@ -14,7 +14,7 @@
             @foreach($this->getRoleDirectory() as $key => $details)
             <div x-show="activeRoleKey === '{{ $key }}'" class="space-y-4" style="display: none;">
 
-                <!-- Native Filament Role Summary Callout -->
+                <!-- Role Summary Callout -->
                 <x-filament::callout
                     :color="$details['color']"
                     :icon="$details['icon']"
@@ -42,7 +42,7 @@
                     </x-slot>
                 </x-filament::callout>
 
-                <!-- Business Gates -->
+                <!-- Business Gates (👈 Replaced danger with primary for restricted gates) -->
                 <x-filament::section icon="heroicon-o-lock-closed" collapsible>
                     <x-slot name="heading">
                         Core Business Gates
@@ -51,7 +51,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         @foreach($details['business_gates'] as $gate)
                         <x-filament::callout
-                            :color="$gate['is_granted'] ? 'success' : 'danger'"
+                            :color="$gate['is_granted'] ? 'success' : 'primary'"
                             :icon="$gate['is_granted'] ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle'"
                             class="p-2.5!">
                             <x-slot name="heading">
@@ -59,7 +59,7 @@
                             </x-slot>
 
                             <x-slot name="controls">
-                                <x-filament::badge :color="$gate['is_granted'] ? 'success' : 'danger'" size="md">
+                                <x-filament::badge :color="$gate['is_granted'] ? 'success' : 'primary'" size="md">
                                     {{ $gate['status'] }}
                                 </x-filament::badge>
                             </x-slot>
@@ -96,7 +96,7 @@
                     </div>
                 </x-filament::section>
 
-                <!-- Focused Comparison Table for This Role -->
+                <!-- Focused Comparison Table (👈 Replaced danger with primary) -->
                 <x-filament::section icon="heroicon-o-table-cells" collapsible collapsed>
                     <x-slot name="heading">
                         Feature Comparison Table
