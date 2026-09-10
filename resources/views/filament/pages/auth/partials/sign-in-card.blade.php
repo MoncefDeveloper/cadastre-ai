@@ -15,10 +15,10 @@
                     class="w-full"
                     size="lg"
                     wire:loading.attr="disabled"
-                    wire:target="authenticate"
+                    wire:target="authenticate, quickLogin"
                 >
-                    <span wire:loading.remove wire:target="authenticate">Sign In</span>
-                    <span wire:loading wire:target="authenticate">Authenticating...</span>
+                    <span wire:loading.remove wire:target="authenticate, quickLogin">Sign In</span>
+                    <span wire:loading wire:target="authenticate, quickLogin">Authenticating...</span>
                 </x-filament::button>
             </div>
         </form>

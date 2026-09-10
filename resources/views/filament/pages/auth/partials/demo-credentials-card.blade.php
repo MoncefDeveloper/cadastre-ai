@@ -7,8 +7,8 @@
             <p class="cad-card-subtitle">Try different user roles instantly</p>
         </div>
 
-        <!-- 2x2 Outlined Grid Buttons -->
-        <div class="cad-role-grid">
+        <!-- 2x2 Outlined Grid Buttons with Instant Debounce & Loading Feedback -->
+        <div class="cad-role-grid transition-opacity duration-200" :class="{ 'opacity-50 pointer-events-none': isLoggingIn }">
             @foreach($this->getDemoAccounts() as $acc)
             <x-filament::button
                 type="button"
@@ -16,6 +16,9 @@
                 :icon="$acc['icon']"
                 size="md"
                 outlined
+                wire:loading.attr="disabled"
+                wire:target="quickLogin, authenticate"
+                x-bind:disabled="isLoggingIn"
                 @click="quickLogin('{{ $acc['email'] }}')"
                 class="w-full justify-center shadow-xs">
                 {{ $acc['role'] }}
@@ -26,6 +29,12 @@
         <!-- Divider -->
         <div class="cad-divider">
             <span>Or copy credentials manually:</span>
+        </div>
+
+        <!-- Demo Password Helper Notice -->
+        <div class="flex items-center justify-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400 mb-3 font-mono">
+            <x-heroicon-m-key class="w-3.5 h-3.5 text-primary-600 dark:text-primary-400 shrink-0" />
+            <span>Default password for all personas: <strong class="text-gray-900 dark:text-white">password</strong></span>
         </div>
 
         <!-- Role Rows with Individual Action Buttons -->
@@ -54,7 +63,6 @@
                 </x-filament::button>
 
                 <div class="relative inline-flex">
-
                     <x-filament::button
                         type="button"
                         icon="heroicon-m-arrow-top-right-on-square"

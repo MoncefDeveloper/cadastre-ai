@@ -2,9 +2,11 @@
    Cadastre AI - Dual Card Login Theme & Carmine Data Stream Animation
    ========================================================================== */
 
-:root {
+/* Dark Mode Tokens (Default / html.dark) */
+:root,
+html.dark {
     --cad-bg-page: #05070b;
-    --cad-bg-card: #0d1117;
+    --cad-bg-card: #0d1117df;
     --cad-border-card: rgba(255, 255, 255, 0.08);
     --cad-shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.03);
     --cad-text-title: #f8fafc;
@@ -13,6 +15,24 @@
     --cad-bg-row-hover: rgba(255, 255, 255, 0.05);
     --cad-border-row: rgba(255, 255, 255, 0.06);
     --cad-border-row-hover: rgba(255, 255, 255, 0.14);
+    --cad-divider: rgba(255, 255, 255, 0.08);
+    --cad-stream-opacity: 0.35;
+}
+
+/* Light Mode Tokens (html:not(.dark)) */
+html:not(.dark) {
+    --cad-bg-page: #f1f5f9; /* Slate 100 chassis matching layout.css */
+    --cad-bg-card: #ffffff;
+    --cad-border-card: #e2e8f0;
+    --cad-shadow-card: 0 20px 35px -10px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+    --cad-text-title: #0f172a; /* Slate 900 */
+    --cad-text-subtitle: #64748b; /* Slate 500 */
+    --cad-bg-row: #f8fafc; /* Slate 50 */
+    --cad-bg-row-hover: #f1f5f9;
+    --cad-border-row: #e2e8f0;
+    --cad-border-row-hover: #cbd5e1;
+    --cad-divider: #e2e8f0;
+    --cad-stream-opacity: 0.18;
 }
 
 /* Fullscreen Viewport Wrapper */
@@ -28,6 +48,7 @@
     padding: 2rem 1.5rem;
     box-sizing: border-box;
     font-family: var(--font-sans);
+    transition: background-color 0.3s ease;
 }
 
 /* --------------------------------------------------------------------------
@@ -41,7 +62,8 @@
     overflow: hidden;
     pointer-events: none;
     z-index: 0;
-    opacity: 0.35;
+    opacity: var(--cad-stream-opacity);
+    transition: opacity 0.3s ease;
 }
 
 .cad-bg-stream-svg {
@@ -152,9 +174,9 @@
     }
 }
 
-/* Base Card */
+/* Base Card (Dual-Theme Adaptive) */
 .cad-card {
-    background-color: #0d1117df;
+    background-color: var(--cad-bg-card);
     border-radius: 1.75rem;
     box-shadow: var(--cad-shadow-card);
     border: 1px solid var(--cad-border-card);
@@ -166,6 +188,7 @@
     height: -webkit-max-content;
     height: -moz-max-content;
     height: max-content;
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .cad-card-header {
@@ -200,7 +223,7 @@
     display: flex;
     align-items: center;
     margin: 1.25rem 0 1rem 0;
-    color: #64748b;
+    color: var(--cad-text-subtitle);
     font-size: 0.725rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -210,7 +233,7 @@
 .cad-divider::before, .cad-divider::after {
     content: '';
     flex: 1;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--cad-divider);
 }
 
 .cad-divider span {
@@ -268,6 +291,19 @@
     overflow: hidden;
     text-overflow: ellipsis;
     margin-top: 0.1rem;
+}
+
+/* --------------------------------------------------------------------------
+   FILAMENT FORM INPUT CALIBRATION (Imperial Carmine Focus Glow)
+   -------------------------------------------------------------------------- */
+.cad-auth-wrapper .fi-input-wrp {
+    transition: border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cad-auth-wrapper .fi-input-wrp:focus-within:not(.fi-invalid) {
+    border-color: #be123c !important;
+    box-shadow: 0 0 0 1px #be123c, 0 0 16px -2px rgba(190, 18, 60, 0.35) !important;
+    --tw-ring-color: #be123c !important;
 }
 
 @-webkit-keyframes cadFadeInUp {

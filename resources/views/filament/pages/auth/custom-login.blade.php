@@ -1,7 +1,10 @@
 <div class="cad-auth-wrapper"
      x-data="{
          activeRoleKey: 'super_admin',
+         isLoggingIn: false,
          quickLogin(email) {
+             if (this.isLoggingIn) return;
+             this.isLoggingIn = true;
              $wire.quickLogin(email);
          },
          copyToClipboard(email, event) {
@@ -73,11 +76,12 @@
             @include('filament.pages.auth.partials.sign-in-card')
         </div>
 
-        <!-- 1-Line Footer: Logo on Left + Warning on Right -->
+        <!-- 1-Line Footer: Adaptive Brand Logo on Left + Warning on Right -->
         <footer class="w-full border-t border-gray-200/80 dark:border-white/10 pt-6 mt-2 flex items-center justify-between">
-            <!-- Left: Brand Logo -->
+            <!-- Left: Brand Logo (Dynamic Theme Swapper) -->
             <div class="flex items-center">
-                <img src="{{ asset('images/cadastre-horizontal-light.svg') }}" class="h-6 w-auto" alt="Cadastre AI" />
+                <img src="{{ asset('images/cadastre-horizontal-light.svg') }}" class="hidden dark:block h-6 w-auto" alt="Cadastre AI" />
+                <img src="{{ asset('images/cadastre-horizontal-dark.svg') }}" class="block dark:hidden h-6 w-auto" alt="Cadastre AI" />
             </div>
 
             <!-- Right: Sandbox Warning Status -->
