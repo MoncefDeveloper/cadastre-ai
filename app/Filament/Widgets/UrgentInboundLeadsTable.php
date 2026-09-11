@@ -14,6 +14,7 @@ use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\HtmlString;
 
 class UrgentInboundLeadsTable extends BaseWidget
 {
@@ -60,6 +61,9 @@ class UrgentInboundLeadsTable extends BaseWidget
                 return $query;
             })
             ->paginated(false)
+            ->emptyStateHeading('Inbox Zero: No Urgent Inquiries')
+            ->emptyStateDescription('All high-priority inbound conversation threads have been successfully triaged and assigned.')
+            ->emptyStateIcon('heroicon-o-check-badge')
             ->columns([
                 // 1. Client Identity & Source
                 TextColumn::make('client.first_name')
@@ -68,29 +72,25 @@ class UrgentInboundLeadsTable extends BaseWidget
                     ->description(fn (Thread $record): string => $record->client?->email ?? 'No email')
                     ->icon('heroicon-m-user')
                     ->weight('bold')
-                    ->searchable(),
+                    ->searchable()
+                    ->tooltip(fn (Thread $record): string => trim(($record->client?->first_name ?? '') . ' ' . ($record->client?->last_name ?? '')) . ' (' . ($record->client?->email ?? 'No email') . ')'),
 
-                // 2. Inquiry Subject & Channel Icon
+                // 2. Inquiry Subject (No Icon, Standardized 30-Char Limit + Full Tooltip)
                 TextColumn::make('subject')
                     ->label('Inquiry Subject')
-                    ->limit(38)
+                    ->limit(30)
+                    ->tooltip(fn (Thread $record): ?string => $record->subject)
                     ->description(fn (Thread $record): string => match ($record->channel) {
                         ThreadChannel::EMAIL => 'Inbound Postmark Email',
                         ThreadChannel::WHATSAPP => 'WhatsApp Concierge',
                         ThreadChannel::WEBFORM => 'Portal Webform',
                         default => 'Direct Channel',
-                    })
-                    ->icon(fn (Thread $record): string => match ($record->channel) {
-                        ThreadChannel::EMAIL => 'heroicon-m-envelope',
-                        ThreadChannel::WHATSAPP => 'heroicon-m-chat-bubble-left-right',
-                        ThreadChannel::WEBFORM => 'heroicon-m-globe-alt',
-                        default => 'heroicon-m-inbox',
-                    })
-                    ->iconColor('primary'),
+                    }),
 
-                // 3. Priority Badge
+                // 3. Priority Badge (Standardized: Centered)
                 TextColumn::make('priority')
                     ->badge()
+                    ->alignCenter()
                     ->formatStateUsing(fn (ThreadPriority $state): string => match ($state) {
                         ThreadPriority::URGENT => 'Urgent',
                         ThreadPriority::HIGH => 'High Priority',
@@ -102,7 +102,7 @@ class UrgentInboundLeadsTable extends BaseWidget
                         ThreadPriority::NORMAL => 'gray',
                     }),
 
-                // 4. Top AI Property Match (The AI Showcase)
+                // 4. Top AI Property Match (Kept Left for Multi-line Layout + Dual Description Tooltip)
                 TextColumn::make('top_match')
                     ->label('Top AI Property Match')
                     ->state(function (Thread $record): string {
@@ -122,25 +122,46 @@ class UrgentInboundLeadsTable extends BaseWidget
                         if ($topMatch->match_score >= 75) return 'warning';
                         return 'gray';
                     })
-                    ->description(function (Thread $record): ?string {
+                    ->description(function (Thread $record): ?HtmlString {
                         $topMatch = $record->propertyMatches->first();
-                        if (! $topMatch || ! $topMatch->property) return null;
-                        return str($topMatch->property->title)->limit(32)->toString();
+                        if (! $topMatch || ! $topMatch->property) {
+                            return null;
+                        }
+
+                        $fullTitle = (string) $topMatch->property->title;
+                        $truncatedTitle = str($fullTitle)->limit(30)->toString();
+
+                        // Native tooltip wrapper on the stacked descriptive subtitle
+                        return new HtmlString('<span title="' . e($fullTitle) . '" class="cursor-help underline decoration-dotted decoration-gray-400 dark:decoration-gray-600">' . e($truncatedTitle) . '</span>');
+                    })
+                    ->tooltip(function (Thread $record): ?string {
+                        $topMatch = $record->propertyMatches->first();
+                        if (! $topMatch || ! $topMatch->property) {
+                            return null;
+                        }
+
+                        $reasoning = $topMatch->reasoning ? "\nReasoning: {$topMatch->reasoning}" : '';
+                        return "Property: {$topMatch->property->title}{$reasoning}";
                     }),
 
-                // 5. Relative Timing
+                // 5. Relative Timing (Standardized: Centered + Exact Date Tooltip)
                 TextColumn::make('last_message_at')
                     ->label('Last Message')
+                    ->alignCenter()
                     ->since()
+                    ->tooltip(fn (Thread $record): ?string => $record->last_message_at?->format('M d, Y - h:i A'))
                     ->sortable(),
             ])
             ->recordActions([
+                // Standardized Action Button: outlined, sm size, sm iconSize
                 Action::make('openInbox')
                     ->label('Open in Inbox')
                     ->icon('heroicon-m-arrow-top-right-on-square')
                     ->color('primary')
+                    ->button()
                     ->outlined()
                     ->size('sm')
+                    ->iconSize('sm')
                     ->url(fn (Thread $record): string => url('/admin/inbox') . '?thread=' . $record->id),
             ]);
     }

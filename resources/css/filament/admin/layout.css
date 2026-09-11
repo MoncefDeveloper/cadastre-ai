@@ -11,18 +11,25 @@
     border-right: none !important;
 }
 
-/* 2. Main Content Canvas (.fi-main) - Exact Match with Widget Cards */
+/* 2. Main Content Canvas (.fi-main) - Expanded State (Flat Right Edge) */
 .dark .fi-main {
     background-color: oklch(17.629% 0.01404 258.383 / 0.4) !important;
     border: 1px solid rgba(245, 182, 182, 0.07) !important;
     border-radius: 1.25rem !important;
+    border-top-right-radius: 0rem !important;
+    border-bottom-right-radius: 0rem !important;
     margin-top: 0.5rem !important;
     margin-bottom: 1rem !important;
     box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6) !important;
     min-height: calc(100vh - 4.5rem) !important;
-    border-top-right-radius: 0rem !important;
-    border-bottom-right-radius: 0rem !important;
+    transition: border-radius 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
 
+/* 2b. Collapsed State: Restores normal symmetrical curves on right side */
+.dark .fi-main-ctn:not(.fi-main-ctn-sidebar-open) .fi-main {
+    border-radius: 1.25rem !important;
+    border-top-right-radius: 1.25rem !important;
+    border-bottom-right-radius: 1.25rem !important;
 }
 
 /* 3. Active Sidebar Tab Pill (Matching Elevated oklch Surface) */
@@ -30,7 +37,6 @@
 .dark .fi-sidebar-item.fi-active a,
 .dark .fi-sidebar-item-active .fi-sidebar-item-button {
     background-color: oklch(0.176 0.014 258.357) !important;
-    /* 👈 Exact match with .fi-main & widgets */
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
     border-radius: 0.75rem !important;
 }
@@ -48,7 +54,7 @@ html:not(.dark) .fi-sidebar {
     border-right: none !important;
 }
 
-/* 2. Main Content Canvas (Pure White Sheet on Slate-100) */
+/* 2. Main Content Canvas - Expanded State (Flat Right Edge) */
 html:not(.dark) .fi-main {
     background-color: #ffffff60 !important;
     border: 1px solid #e2e8f0 !important;
@@ -59,6 +65,14 @@ html:not(.dark) .fi-main {
     margin-bottom: 1rem !important;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04) !important;
     min-height: calc(100vh - 4.5rem) !important;
+    transition: border-radius 0.25s cubic-bezier(0.4, 0, 0.2, 1), margin-right 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* 2b. Collapsed State: Restores normal symmetrical curves on right side */
+html:not(.dark) .fi-main-ctn:not(.fi-main-ctn-sidebar-open) .fi-main {
+    border-radius: 1.25rem !important;
+    border-top-right-radius: 1.25rem !important;
+    border-bottom-right-radius: 1.25rem !important;
 }
 
 /* 3. Active Sidebar Tab Pill (Pure White Elevated Card on Slate-100) */
