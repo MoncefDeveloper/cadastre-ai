@@ -14,22 +14,16 @@ class CreateClient extends CreateRecord
 {
     protected static string $resource = ClientResource::class;
 
-    /**
-     * 🔄 Redirect directly back to the Clients index table after creation
-     */
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
     }
 
-    /**
-     * ⚡ Quick Fill Header Action for Testing
-     */
     protected function getHeaderActions(): array
     {
         return [
             Action::make('quickFill')
-                ->label('⚡ Quick Fill')
+                ->label('Quick Fill')
                 ->icon('heroicon-m-sparkles')
                 ->outlined()
                 ->color('warning')
