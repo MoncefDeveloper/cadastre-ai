@@ -91,13 +91,12 @@ class CategoryResource extends Resource
                     ->alignRight()
                     ->columnSpanFull(),
 
-                // Left Column: Name with custom validation messages
                 TextInput::make('name')
                     ->required()
                     ->maxLength(255)
                     ->live(onBlur: true)
                     ->afterStateUpdated(
-                        fn (string $operation, $state, callable $set) =>
+                        fn(string $operation, $state, callable $set) =>
                         $operation === 'create' ? $set('slug', Str::slug($state)) : null
                     )
                     ->validationMessages([
@@ -105,7 +104,6 @@ class CategoryResource extends Resource
                         'max' => 'The category name cannot exceed 255 characters.',
                     ]),
 
-                // Right Column: Slug with custom validation messages
                 TextInput::make('slug')
                     ->required()
                     ->maxLength(255)
@@ -115,7 +113,6 @@ class CategoryResource extends Resource
                         'unique' => 'This URL slug is already in use by another category.',
                     ]),
 
-                // Left Column: Description
                 MarkdownEditor::make('description')
                     ->label('Category Narrative / Description')
                     ->placeholder('Enter rich details about this category...')
@@ -127,17 +124,15 @@ class CategoryResource extends Resource
                         'link',
                     ]),
 
-                // Right Column: Image Uploader
                 FileUpload::make('icon')
                     ->label('Category Image / Icon')
                     ->image()
                     ->directory('category-icons')
                     ->maxSize(2048)
                     ->imageEditor()
-                    ->disabled(fn (?Category $record): bool => auth()->id() !== 1 && $record !== null && $record->isBaselineRecord())
-                    ->helperText(fn (?Category $record): ?string => auth()->id() !== 1 && $record?->isBaselineRecord() ? '🛡️ Baseline category icon is locked from modification in demo mode.' : null),
+                    ->disabled(fn(?Category $record): bool => auth()->id() !== 1 && $record !== null && $record->isBaselineRecord())
+                    ->helperText(fn(?Category $record): ?string => auth()->id() !== 1 && $record?->isBaselineRecord() ? '🛡️ Baseline category icon is locked from modification in demo mode.' : null),
 
-                // Left Column: Visibility with custom validation
                 Select::make('is_active')
                     ->label('Visibility Status')
                     ->options([
@@ -152,10 +147,8 @@ class CategoryResource extends Resource
                         'required' => 'Please select whether this category is active or inactive.',
                     ]),
 
-                // Right Column: Color
                 ColorPicker::make('color'),
 
-                // Left Column: Type with custom validation
                 Select::make('type')
                     ->options(CategoryType::class)
                     ->default(CategoryType::PROPERTY)
@@ -165,7 +158,6 @@ class CategoryResource extends Resource
                         'required' => 'Please designate the taxonomy type (Property, Template, or Client Tag).',
                     ]),
 
-                // Right Column: Parent Category
                 Select::make('parent_id')
                     ->relationship('parent', 'name')
                     ->searchable()
@@ -178,70 +170,86 @@ class CategoryResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->checkIfRecordIsSelectableUsing(fn (Model $record): bool => ! method_exists($record, 'isBaselineRecord') || ! $record->isBaselineRecord() || auth()->id() === 1)
+            ->checkIfRecordIsSelectableUsing(fn(Model $record): bool => ! method_exists($record, 'isBaselineRecord') || ! $record->isBaselineRecord() || auth()->id() === 1)
             ->defaultSort('created_at', 'desc')
             ->emptyStateHeading('No categories found')
             ->emptyStateDescription('Create a category to classify properties, templates, or client tags.')
             ->emptyStateIcon('heroicon-o-tag')
             ->columns([
-                // 1. Name with 30-char limit & unclipped tooltip
+                // 1. Name with 30-char limit, unclipped tooltip & toggleable
                 TextColumn::make('name')
                     ->searchable()
                     ->sortable()
                     ->limit(30)
-                    ->tooltip(fn (Category $record): ?string => $record->name),
+                    ->tooltip(fn(Category $record): ?string => $record->name),
 
-                // 2. Slug with 30-char limit & unclipped tooltip
+                // 2. Slug (Toggleable)
                 TextColumn::make('slug')
                     ->searchable()
                     ->limit(30)
-                    ->tooltip(fn (Category $record): ?string => $record->slug),
+                    ->tooltip(fn(Category $record): ?string => $record->slug)
+                    ->toggleable(isToggledHiddenByDefault: true),
 
-                // 3. Icon (Centered with Spacing Gutter)
+                // 3. Icon (Centered with Spacing Gutter & Toggleable)
                 ImageColumn::make('icon')
                     ->label('Icon')
                     ->circular()
                     ->alignCenter()
-                    ->extraHeaderAttributes(['class' => 'px-6'])
-                    ->extraCellAttributes(['class' => 'px-6'])
-                    ->defaultImageUrl(url('/images/placeholder.png')),
+                    ->extraHeaderAttributes(['class' => 'px-4'])
+                    ->extraCellAttributes(['class' => 'px-4'])
+                    ->defaultImageUrl(url('/images/placeholder.png'))
+                    ->toggleable(),
 
-                // 4. Color Chip (Centered with Spacing Gutter)
+                // 4. Color Chip (Centered with Spacing Gutter & Toggleable)
                 ColorColumn::make('color')
                     ->alignCenter()
-                    ->extraHeaderAttributes(['class' => 'px-6'])
-                    ->extraCellAttributes(['class' => 'px-6']),
+                    ->extraHeaderAttributes(['class' => 'px-4'])
+                    ->extraCellAttributes(['class' => 'px-4'])
+                    ->toggleable(),
 
-                // 5. Active Toggle (Centered with Spacing Gutter)
+                // 5. Active Toggle (Centered with Spacing Gutter & Toggleable)
                 ToggleColumn::make('is_active')
                     ->sortable()
                     ->label('Active')
                     ->alignCenter()
-                    ->extraHeaderAttributes(['class' => 'px-6'])
-                    ->extraCellAttributes(['class' => 'px-6'])
-                    ->disabled(fn (): bool => ! auth()->user()->can('Update:Category')),
+                    ->extraHeaderAttributes(['class' => 'px-4'])
+                    ->extraCellAttributes(['class' => 'px-4'])
+                    ->disabled(fn(): bool => ! auth()->user()->can('Update:Category'))
+                    ->toggleable(),
 
-                // 6. Type Badge (Centered with Spacing Gutter)
+                // 6. Type Badge (Centered with Spacing Gutter & Toggleable)
                 TextColumn::make('type')
                     ->badge()
                     ->sortable()
                     ->alignCenter()
-                    ->extraHeaderAttributes(['class' => 'px-6'])
-                    ->extraCellAttributes(['class' => 'px-6']),
+                    ->extraHeaderAttributes(['class' => 'px-4'])
+                    ->extraCellAttributes(['class' => 'px-4'])
+                    ->toggleable(),
 
-                // 7. Clickable Parent Category (Opens Parent Edit Modal directly)
+                // 7. Clickable Parent Category (Opens Parent Edit Modal directly & Toggleable)
                 TextColumn::make('parent.name')
                     ->label('Parent')
                     ->sortable()
                     ->alignCenter()
                     ->placeholder('—')
-                    ->color(fn (Category $record): ?string => $record->parent_id ? 'primary' : null)
-                    ->tooltip(fn (Category $record): ?string => $record->parent ? "Click to inspect {$record->parent->name}" : null)
+                    ->color(fn(Category $record): ?string => $record->parent_id ? 'primary' : null)
+                    ->tooltip(fn(Category $record): ?string => $record->parent ? "Click to inspect {$record->parent->name}" : null)
                     ->action(
-                        fn (Category $record, $livewire) => $record->parent_id
+                        fn(Category $record, $livewire) => $record->parent_id
                             ? $livewire->mountTableAction('edit', (string) $record->parent_id)
                             : null
-                    ),
+                    )
+                    ->extraAttributes(fn(Category $record): array => $record->parent_id ? ['class' => 'underline'] : [])
+                    ->toggleable(),
+
+                // 8. Creation Timestamp (Centered, Toggleable, hidden by default)
+                TextColumn::make('created_at')
+                    ->label('Created')
+                    ->dateTime()
+                    ->sortable()
+                    ->alignCenter()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->tooltip(fn(Category $record): ?string => $record->created_at?->format('M d, Y - h:i A')),
             ])
             ->filters([
                 SelectFilter::make('type')
@@ -249,7 +257,6 @@ class CategoryResource extends Resource
                     ->label('Category Type'),
             ])
             ->recordActions([
-                // Standardized Action Button: info color, outlined, sm size
                 EditAction::make()
                     ->color('info')
                     ->button()
@@ -257,11 +264,11 @@ class CategoryResource extends Resource
                     ->size('sm')
                     ->iconSize('sm'),
 
-                // Standardized Delete Button: danger color, outlined, sm size
                 DeleteAction::make()
                     ->icon('heroicon-o-trash')
                     ->outlined()
                     ->button()
+                    ->color('primary')
                     ->size('sm')
                     ->iconSize('sm'),
             ])
