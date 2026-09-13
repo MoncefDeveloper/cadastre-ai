@@ -36,17 +36,29 @@ class PropertyForm
                         ->schema([
                             TextInput::make('title')
                                 ->required()
+                                ->maxLength(255)
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(fn(callable $set, ?string $state) => $set('slug', Str::slug($state ?? ''))),
+                                ->afterStateUpdated(fn (callable $set, ?string $state) => $set('slug', Str::slug($state ?? '')))
+                                ->validationMessages([
+                                    'required' => 'Please enter a descriptive title for this property listing.',
+                                    'max' => 'The property title cannot exceed 255 characters.',
+                                ]),
 
                             TextInput::make('slug')
                                 ->required()
-                                ->unique(ignoreRecord: true),
+                                ->maxLength(255)
+                                ->unique(ignoreRecord: true)
+                                ->validationMessages([
+                                    'required' => 'A unique URL slug is required for web matching.',
+                                    'unique' => 'This URL slug is already assigned to another property.',
+                                ]),
 
                             MarkdownEditor::make('description')
                                 ->required()
-                                // ->fileAttachmentsDisk()
-                                ->columnSpanFull(),
+                                ->columnSpanFull()
+                                ->validationMessages([
+                                    'required' => 'Please provide a detailed architectural description of the property.',
+                                ]),
                         ]),
 
                     // STEP 2: LOCATION & SPECS
@@ -58,23 +70,44 @@ class PropertyForm
                         ->schema([
                             TextInput::make('city')
                                 ->required()
-                                ->columnSpan(1),
+                                ->maxLength(100)
+                                ->columnSpan(1)
+                                ->validationMessages([
+                                    'required' => 'The property city is required for geographical lead matching.',
+                                ]),
 
                             TextInput::make('address')
+                                ->maxLength(255)
                                 ->columnSpan(1),
 
                             TextInput::make('area_sqm')
                                 ->label('Area (m²)')
                                 ->numeric()
-                                ->required(),
+                                ->minValue(1)
+                                ->required()
+                                ->validationMessages([
+                                    'required' => 'Please specify the total area in square meters.',
+                                    'numeric' => 'The area must be a valid numerical value.',
+                                    'min' => 'The area must be at least 1 square meter.',
+                                ]),
 
                             TextInput::make('bedrooms')
                                 ->numeric()
-                                ->default(0),
+                                ->default(0)
+                                ->minValue(0)
+                                ->validationMessages([
+                                    'numeric' => 'Bedrooms must be a valid number.',
+                                    'min' => 'Bedrooms cannot be negative.',
+                                ]),
 
                             TextInput::make('bathrooms')
                                 ->numeric()
-                                ->default(0),
+                                ->default(0)
+                                ->minValue(0)
+                                ->validationMessages([
+                                    'numeric' => 'Bathrooms must be a valid number.',
+                                    'min' => 'Bathrooms cannot be negative.',
+                                ]),
                         ]),
 
                     // STEP 3: CLASSIFICATION & PRICING
@@ -88,49 +121,75 @@ class PropertyForm
                                 ->relationship('agent', 'name')
                                 ->searchable()
                                 ->preload()
-                                ->required(),
+                                ->required()
+                                ->validationMessages([
+                                    'required' => 'Please assign a managing real estate agent to this property.',
+                                ]),
 
                             Select::make('category_id')
                                 ->relationship('category', 'name')
                                 ->searchable()
                                 ->preload()
-                                ->required(),
+                                ->required()
+                                ->validationMessages([
+                                    'required' => 'Please select a portfolio category for this listing.',
+                                ]),
 
                             Select::make('listing_type')
                                 ->options(ListingType::class)
-                                ->required(),
+                                ->required()
+                                ->validationMessages([
+                                    'required' => 'Please specify whether this listing is for Sale or for Rent.',
+                                ]),
 
                             Select::make('property_type')
                                 ->options(PropertyType::class)
-                                ->required(),
+                                ->required()
+                                ->validationMessages([
+                                    'required' => 'Please select a property classification type (e.g. Villa, Penthouse).',
+                                ]),
 
                             Select::make('status')
                                 ->options(PropertyStatus::class)
                                 ->default(PropertyStatus::AVAILABLE)
                                 ->required()
                                 ->disabled(
-                                    fn(?Property $record): bool =>
+                                    fn (?Property $record): bool =>
                                     $record !== null &&
                                         in_array($record->status, [PropertyStatus::SOLD, PropertyStatus::RENTED], true) &&
                                         ! auth()->user()->can('reopen_closed_listings')
-                                ),
+                                )
+                                ->validationMessages([
+                                    'required' => 'The property transaction status must be set.',
+                                ]),
 
                             TextInput::make('price')
                                 ->required()
                                 ->numeric()
+                                ->minValue(1)
                                 ->prefix('€')
-                                ->formatStateUsing(fn($state) => $state ? $state / 100 : null)
-                                ->dehydrateStateUsing(fn($state) => (int) ($state * 100))
-                                ->disabled(fn(string $context): bool => $context === 'edit' && ! auth()->user()->can('update_property_pricing'))
-                                ->dehydrated(fn(string $context): bool => $context === 'create' || auth()->user()->can('update_property_pricing')),
+                                ->formatStateUsing(fn ($state) => $state ? $state / 100 : null)
+                                ->dehydrateStateUsing(fn ($state) => (int) ($state * 100))
+                                ->disabled(fn (string $context): bool => $context === 'edit' && ! auth()->user()->can('update_property_pricing'))
+                                ->dehydrated(fn (string $context): bool => $context === 'create' || auth()->user()->can('update_property_pricing'))
+                                ->validationMessages([
+                                    'required' => 'Please enter the listing acquisition or lease price.',
+                                    'numeric' => 'Price must be a valid numerical value.',
+                                    'min' => 'Price must be greater than zero.',
+                                ]),
 
                             TextInput::make('discount_price')
                                 ->numeric()
+                                ->minValue(1)
                                 ->prefix('€')
-                                ->formatStateUsing(fn($state) => $state ? $state / 100 : null)
-                                ->dehydrateStateUsing(fn($state) => $state ? (int) ($state * 100) : null)
-                                ->disabled(fn(string $context): bool => $context === 'edit' && ! auth()->user()->can('update_property_pricing'))
-                                ->dehydrated(fn(string $context): bool => $context === 'create' || auth()->user()->can('update_property_pricing')),
+                                ->formatStateUsing(fn ($state) => $state ? $state / 100 : null)
+                                ->dehydrateStateUsing(fn ($state) => $state ? (int) ($state * 100) : null)
+                                ->disabled(fn (string $context): bool => $context === 'edit' && ! auth()->user()->can('update_property_pricing'))
+                                ->dehydrated(fn (string $context): bool => $context === 'create' || auth()->user()->can('update_property_pricing'))
+                                ->validationMessages([
+                                    'numeric' => 'Discount price must be a valid numerical value.',
+                                    'min' => 'Discount price must be greater than zero.',
+                                ]),
                         ]),
 
                     // STEP 4: MEDIA & VISIBILITY
@@ -156,13 +215,13 @@ class PropertyForm
                                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                                 ->maxSize(10240)
                                 ->columnSpanFull()
-                                ->disabled(fn(?Property $record): bool => auth()->id() !== 1 && $record !== null && $record->isBaselineRecord())
-                                ->helperText(fn(?Property $record): ?string => auth()->id() !== 1 && $record?->isBaselineRecord() ? '🛡️ Baseline property media gallery is locked from modification in demo mode.' : null),
+                                ->disabled(fn (?Property $record): bool => auth()->id() !== 1 && $record !== null && $record->isBaselineRecord())
+                                ->helperText(fn (?Property $record): ?string => auth()->id() !== 1 && $record?->isBaselineRecord() ? '🛡️ Baseline property media gallery is locked from modification in demo mode.' : null),
                         ]),
                 ])
-                    ->skippable() // Allows agents to jump between tabs easily
-                    ->persistStepInQueryString() // Keeps current step on page refresh
-                    ->columnSpanFull(), // Ensures the wizard takes the full width of the page
+                    ->skippable()
+                    ->persistStepInQueryString()
+                    ->columnSpanFull(),
             ]);
     }
 }

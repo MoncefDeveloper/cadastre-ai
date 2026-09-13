@@ -1,13 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Properties\Pages;
 
 use App\Filament\Resources\Properties\PropertyResource;
+use App\Services\Property\PropertyImageService;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
-use App\Services\Property\PropertyImageService;
-
 
 class EditProperty extends EditRecord
 {
@@ -16,14 +17,17 @@ class EditProperty extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make(),
-            DeleteAction::make(),
+            ViewAction::make()
+                ->icon('heroicon-o-eye'),
+
+            DeleteAction::make()
+                ->icon('heroicon-o-trash')
+                ->outlined(),
         ];
     }
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        // Pre-fill the FileUpload component with existing images ordered correctly
         $data['image_uploads'] = $this->getRecord()->images()->orderBy('sort_order')->pluck('image_path')->toArray();
 
         return $data;
@@ -40,7 +44,6 @@ class EditProperty extends EditRecord
     {
         $images = $this->data['image_uploads'] ?? [];
 
-        // Resolve the service from the container and execute
         app(PropertyImageService::class)->syncImages($this->getRecord(), $images);
     }
 }
