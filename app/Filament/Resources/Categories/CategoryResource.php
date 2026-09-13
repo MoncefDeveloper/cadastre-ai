@@ -26,6 +26,7 @@ use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -90,19 +91,29 @@ class CategoryResource extends Resource
                     ->alignRight()
                     ->columnSpanFull(),
 
-                // Left Column: Name
+                // Left Column: Name with custom validation messages
                 TextInput::make('name')
                     ->required()
+                    ->maxLength(255)
                     ->live(onBlur: true)
                     ->afterStateUpdated(
-                        fn(string $operation, $state, callable $set) =>
+                        fn (string $operation, $state, callable $set) =>
                         $operation === 'create' ? $set('slug', Str::slug($state)) : null
-                    ),
+                    )
+                    ->validationMessages([
+                        'required' => 'Please enter a unique category name.',
+                        'max' => 'The category name cannot exceed 255 characters.',
+                    ]),
 
-                // Right Column: Slug
+                // Right Column: Slug with custom validation messages
                 TextInput::make('slug')
                     ->required()
-                    ->unique(ignoreRecord: true),
+                    ->maxLength(255)
+                    ->unique(ignoreRecord: true)
+                    ->validationMessages([
+                        'required' => 'A unique URL slug is required.',
+                        'unique' => 'This URL slug is already in use by another category.',
+                    ]),
 
                 // Left Column: Description
                 MarkdownEditor::make('description')
@@ -123,11 +134,10 @@ class CategoryResource extends Resource
                     ->directory('category-icons')
                     ->maxSize(2048)
                     ->imageEditor()
-                    // 🛡️ Lock image upload on baseline categories for visitors
-                    ->disabled(fn(?Category $record): bool => auth()->id() !== 1 && $record !== null && $record->isBaselineRecord())
-                    ->helperText(fn(?Category $record): ?string => auth()->id() !== 1 && $record?->isBaselineRecord() ? '🛡️ Baseline category icon is locked from modification in demo mode.' : null),
+                    ->disabled(fn (?Category $record): bool => auth()->id() !== 1 && $record !== null && $record->isBaselineRecord())
+                    ->helperText(fn (?Category $record): ?string => auth()->id() !== 1 && $record?->isBaselineRecord() ? '🛡️ Baseline category icon is locked from modification in demo mode.' : null),
 
-                // Left Column: Visibility
+                // Left Column: Visibility with custom validation
                 Select::make('is_active')
                     ->label('Visibility Status')
                     ->options([
@@ -137,17 +147,23 @@ class CategoryResource extends Resource
                     ->default(1)
                     ->required()
                     ->native(false)
-                    ->selectablePlaceholder(false),
+                    ->selectablePlaceholder(false)
+                    ->validationMessages([
+                        'required' => 'Please select whether this category is active or inactive.',
+                    ]),
 
                 // Right Column: Color
                 ColorPicker::make('color'),
 
-                // Left Column: Type
+                // Left Column: Type with custom validation
                 Select::make('type')
                     ->options(CategoryType::class)
                     ->default(CategoryType::PROPERTY)
                     ->required()
-                    ->live(),
+                    ->live()
+                    ->validationMessages([
+                        'required' => 'Please designate the taxonomy type (Property, Template, or Client Tag).',
+                    ]),
 
                 // Right Column: Parent Category
                 Select::make('parent_id')
@@ -162,25 +178,92 @@ class CategoryResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->checkIfRecordIsSelectableUsing(fn(Model $record): bool => ! method_exists($record, 'isBaselineRecord') || ! $record->isBaselineRecord() || auth()->id() === 1)
+            ->checkIfRecordIsSelectableUsing(fn (Model $record): bool => ! method_exists($record, 'isBaselineRecord') || ! $record->isBaselineRecord() || auth()->id() === 1)
+            ->defaultSort('created_at', 'desc')
+            ->emptyStateHeading('No categories found')
+            ->emptyStateDescription('Create a category to classify properties, templates, or client tags.')
+            ->emptyStateIcon('heroicon-o-tag')
             ->columns([
-                TextColumn::make('name')->searchable()->sortable(),
-                TextColumn::make('slug')->searchable(),
+                // 1. Name with 30-char limit & unclipped tooltip
+                TextColumn::make('name')
+                    ->searchable()
+                    ->sortable()
+                    ->limit(30)
+                    ->tooltip(fn (Category $record): ?string => $record->name),
+
+                // 2. Slug with 30-char limit & unclipped tooltip
+                TextColumn::make('slug')
+                    ->searchable()
+                    ->limit(30)
+                    ->tooltip(fn (Category $record): ?string => $record->slug),
+
+                // 3. Icon (Centered with Spacing Gutter)
                 ImageColumn::make('icon')
                     ->label('Icon')
                     ->circular()
+                    ->alignCenter()
+                    ->extraHeaderAttributes(['class' => 'px-6'])
+                    ->extraCellAttributes(['class' => 'px-6'])
                     ->defaultImageUrl(url('/images/placeholder.png')),
-                ColorColumn::make('color'),
-                ToggleColumn::make('is_active')->sortable()->label('Active')
-                    ->disabled(fn(): bool => ! auth()->user()->can('Update:Category')),
-                TextColumn::make('type')->badge()->sortable(),
-                TextColumn::make('parent.name')->label('Parent')->sortable(),
+
+                // 4. Color Chip (Centered with Spacing Gutter)
+                ColorColumn::make('color')
+                    ->alignCenter()
+                    ->extraHeaderAttributes(['class' => 'px-6'])
+                    ->extraCellAttributes(['class' => 'px-6']),
+
+                // 5. Active Toggle (Centered with Spacing Gutter)
+                ToggleColumn::make('is_active')
+                    ->sortable()
+                    ->label('Active')
+                    ->alignCenter()
+                    ->extraHeaderAttributes(['class' => 'px-6'])
+                    ->extraCellAttributes(['class' => 'px-6'])
+                    ->disabled(fn (): bool => ! auth()->user()->can('Update:Category')),
+
+                // 6. Type Badge (Centered with Spacing Gutter)
+                TextColumn::make('type')
+                    ->badge()
+                    ->sortable()
+                    ->alignCenter()
+                    ->extraHeaderAttributes(['class' => 'px-6'])
+                    ->extraCellAttributes(['class' => 'px-6']),
+
+                // 7. Clickable Parent Category (Opens Parent Edit Modal directly)
+                TextColumn::make('parent.name')
+                    ->label('Parent')
+                    ->sortable()
+                    ->alignCenter()
+                    ->placeholder('—')
+                    ->color(fn (Category $record): ?string => $record->parent_id ? 'primary' : null)
+                    ->tooltip(fn (Category $record): ?string => $record->parent ? "Click to inspect {$record->parent->name}" : null)
+                    ->action(
+                        fn (Category $record, $livewire) => $record->parent_id
+                            ? $livewire->mountTableAction('edit', (string) $record->parent_id)
+                            : null
+                    ),
             ])
-            ->filters([])
+            ->filters([
+                SelectFilter::make('type')
+                    ->options(CategoryType::class)
+                    ->label('Category Type'),
+            ])
             ->recordActions([
+                // Standardized Action Button: info color, outlined, sm size
                 EditAction::make()
-                    ->color('gray'),
-                DeleteAction::make(),
+                    ->color('info')
+                    ->button()
+                    ->outlined()
+                    ->size('sm')
+                    ->iconSize('sm'),
+
+                // Standardized Delete Button: danger color, outlined, sm size
+                DeleteAction::make()
+                    ->icon('heroicon-o-trash')
+                    ->outlined()
+                    ->button()
+                    ->size('sm')
+                    ->iconSize('sm'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -15,7 +15,8 @@ class ManageCategories extends ManageRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()
+                ->icon('heroicon-o-plus-circle'),
         ];
     }
 }
