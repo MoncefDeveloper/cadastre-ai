@@ -23,18 +23,17 @@ use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class SandboxTopbarWidget extends Component implements HasActions, HasSchemas
 {
     use InteractsWithActions, InteractsWithSchemas;
+
     public bool $inspectorOpen = false;
 
     /**
-     * ⚡ Ultra-Fast Aggregate Visitor Count (For the Topbar Pill)
-     * Queries only total visitor counts (id > limit) without full table scans.
+     * Ultra-Fast Aggregate Visitor Count (For the Topbar Pill)
      */
     #[Computed]
     public function visitorRecordsCount(): int
@@ -44,6 +43,7 @@ class SandboxTopbarWidget extends Component implements HasActions, HasSchemas
         $clientLimit   = (int) config('sandbox.limits.clients', 10);
         $threadLimit   = (int) config('sandbox.limits.threads', 6);
         $templateLimit = (int) config('sandbox.limits.templates', 10);
+        $modifierLimit = (int) config('sandbox.limits.ai_modifiers', 10);
         $userLimit     = (int) config('sandbox.limits.users', 7);
 
         return Property::where('id', '>', $propertyLimit)->count()
@@ -51,12 +51,12 @@ class SandboxTopbarWidget extends Component implements HasActions, HasSchemas
             + Client::where('id', '>', $clientLimit)->count()
             + Thread::where('id', '>', $threadLimit)->count()
             + Template::where('id', '>', $templateLimit)->count()
+            + AiModifier::where('id', '>', $modifierLimit)->count()
             + User::where('id', '>', $userLimit)->count();
     }
 
     /**
-     * 🧠 Lazy-Loaded Detailed Model Inspector
-     * Only executes when the evaluator opens the slide-over modal.
+     * Lazy-Loaded Detailed Model Inspector
      */
     #[Computed]
     public function inspectorData(): array
@@ -79,6 +79,7 @@ class SandboxTopbarWidget extends Component implements HasActions, HasSchemas
             'Clients'      => ['class' => Client::class, 'limit' => config('sandbox.limits.clients', 10), 'name' => 'first_name', 'icon' => 'heroicon-m-users', 'resource' => \App\Filament\Resources\Clients\ClientResource::class],
             'Threads'      => ['class' => Thread::class, 'limit' => config('sandbox.limits.threads', 6), 'name' => 'subject', 'icon' => 'heroicon-m-chat-bubble-left-right', 'url' => url('/admin/inbox')],
             'Templates'    => ['class' => Template::class, 'limit' => config('sandbox.limits.templates', 10), 'name' => 'name', 'icon' => 'heroicon-m-document-duplicate', 'resource' => \App\Filament\Resources\Templates\TemplateResource::class],
+            'AI Modifiers' => ['class' => AiModifier::class, 'limit' => config('sandbox.limits.ai_modifiers', 10), 'name' => 'label', 'icon' => 'heroicon-m-sparkles', 'resource' => \App\Filament\Resources\AiModifiers\AiModifierResource::class],
             'Plans'        => ['class' => Plan::class, 'limit' => config('sandbox.limits.plans', 3), 'name' => 'name', 'icon' => 'heroicon-m-credit-card', 'resource' => \App\Filament\Resources\Plans\PlanResource::class],
             'Coupons'      => ['class' => Coupon::class, 'limit' => config('sandbox.limits.coupons', 5), 'name' => 'code', 'icon' => 'heroicon-m-ticket', 'resource' => \App\Filament\Resources\Coupons\CouponResource::class],
             'Faqs'         => ['class' => Faq::class, 'limit' => config('sandbox.limits.faqs', 6), 'name' => 'question', 'icon' => 'heroicon-m-question-mark-circle', 'resource' => \App\Filament\Resources\Faqs\FaqResource::class],
@@ -87,7 +88,7 @@ class SandboxTopbarWidget extends Component implements HasActions, HasSchemas
         ];
 
         $totalBaseline = 0;
-        $totalModified = 0; // 👈 Track total modified baseline records
+        $totalModified = 0;
         $totalGrace = 0;
         $totalExpired = 0;
         $modelBreakdowns = [];
@@ -98,7 +99,7 @@ class SandboxTopbarWidget extends Component implements HasActions, HasSchemas
             $nameCol = $cfg['name'];
             $icon = $cfg['icon'];
 
-            // 🛡️ GHOST ADMIN CONCEALMENT: Exclude User ID 1 for non-root visitors
+            // Ghost Admin Concealment: Exclude User ID 1 for non-root visitors
             $query = $class::orderBy('id');
             if ($class === User::class && auth()->id() !== 1) {
                 $query->where('id', '!=', 1);
@@ -106,7 +107,6 @@ class SandboxTopbarWidget extends Component implements HasActions, HasSchemas
 
             $records = $query->get();
             $effectiveLimit = ($class === User::class && auth()->id() !== 1) ? $limit - 1 : $limit;
-            // Log::info("Effective Limit: {$effectiveLimit}");
 
             $baselineCount = 0;
             $modifiedCount = 0;
@@ -128,7 +128,6 @@ class SandboxTopbarWidget extends Component implements HasActions, HasSchemas
                     $baselineCount++;
                     $totalBaseline++;
 
-                    // 🔍 Detect if baseline record was updated
                     if ($updatedAt && $createdAt && $updatedAt->gt($createdAt)) {
                         $isModified = true;
                         $modifiedCount++;
@@ -156,7 +155,7 @@ class SandboxTopbarWidget extends Component implements HasActions, HasSchemas
                         } else {
                             $recordUrl = $cfg['resource']::getUrl('index');
                         }
-                    } catch (\Throwable $e) {
+                    } catch (\Throwable) {
                         $recordUrl = $cfg['resource']::getUrl('index');
                     }
                 } elseif (isset($cfg['url'])) {
@@ -169,17 +168,17 @@ class SandboxTopbarWidget extends Component implements HasActions, HasSchemas
                     'status' => $status,
                     'is_modified' => $isModified,
                     'age_minutes' => $ageMinutes,
-                    'updated_age_minutes' => $updatedAgeMinutes, // 👈 Pass this to the view
+                    'updated_age_minutes' => $updatedAgeMinutes,
                     'url' => $recordUrl,
                 ];
             }
 
             $modelBreakdowns[$label] = [
                 'icon' => $icon,
-                'limit' => $effectiveLimit, // 👈 Shows 6 for visitors, 7 for Root Admin
+                'limit' => $effectiveLimit,
                 'index_url' => $indexUrl,
                 'baseline_count' => $baselineCount,
-                'modified_count' => $modifiedCount, // 👈 For section header badge
+                'modified_count' => $modifiedCount,
                 'grace_count' => $graceCount,
                 'expired_count' => $expiredCount,
                 'records' => $formattedRecords,
@@ -188,7 +187,7 @@ class SandboxTopbarWidget extends Component implements HasActions, HasSchemas
 
         return [
             'total_baseline' => $totalBaseline,
-            'total_modified' => $totalModified, // 👈 For top card
+            'total_modified' => $totalModified,
             'total_grace'    => $totalGrace,
             'total_expired'  => $totalExpired,
             'models'         => $modelBreakdowns,
@@ -239,6 +238,7 @@ class SandboxTopbarWidget extends Component implements HasActions, HasSchemas
             ->success()
             ->send();
     }
+
     public function render(): View
     {
         return view('filament.components.sandbox-topbar-widget');
@@ -257,40 +257,32 @@ class SandboxTopbarWidget extends Component implements HasActions, HasSchemas
             + Client::where('id', '<=', config('sandbox.limits.clients', 10))->whereColumn('updated_at', '>', 'created_at')->count();
     }
 
-    /**
-     * 🔢 Combined total of visitor-created records + modified baseline records
-     */
     #[Computed]
     public function totalPendingActionsCount(): int
     {
         return $this->visitorRecordsCount + $this->modifiedBaselineCount;
     }
 
-    /**
-     * 🚦 Dynamic Lifecycle Status Color
-     */
     #[Computed]
     public function statusColor(): string
     {
         $cutoff = now()->subMinutes((int) config('sandbox.cleanup_interval_minutes', 30));
 
-        // 1. Red if any visitor record has expired (>= 30m)
         $hasExpired = Property::where('id', '>', config('sandbox.limits.properties', 10))->where('created_at', '<', $cutoff)->exists()
             || Category::where('id', '>', config('sandbox.limits.categories', 10))->where('created_at', '<', $cutoff)->exists()
             || Client::where('id', '>', config('sandbox.limits.clients', 10))->where('created_at', '<', $cutoff)->exists()
             || Thread::where('id', '>', config('sandbox.limits.threads', 6))->where('created_at', '<', $cutoff)->exists()
+            || AiModifier::where('id', '>', config('sandbox.limits.ai_modifiers', 10))->where('created_at', '<', $cutoff)->exists()
             || User::where('id', '>', config('sandbox.limits.users', 7))->where('created_at', '<', $cutoff)->exists();
 
         if ($hasExpired) {
             return 'danger';
         }
 
-        // 2. Amber if new visitor records exist OR baseline records were modified
         if ($this->totalPendingActionsCount > 0) {
             return 'warning';
         }
 
-        // 3. Green if 100% clean and pristine
         return 'success';
     }
 }

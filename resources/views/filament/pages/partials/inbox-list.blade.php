@@ -2,7 +2,6 @@
 <div class="flex items-center justify-between p-4 shrink-0">
     <div class="flex items-center gap-3">
         <h2 class="font-bold text-xl text-gray-900 dark:text-white tracking-tight">Inbox</h2>
-        <x-filament::badge color="info" size="sm">Live</x-filament::badge>
     </div>
 
     <div class="flex items-center gap-2">
@@ -37,7 +36,8 @@
             placeholder="Search emails or clients..." />
     </x-filament::input.wrapper>
 </div>
-<!-- Tabs Alternative: Grid-based Filter Buttons with Corner Badges -->
+
+<!-- Tabs: Brand Primary Active State + Amber Alert for Unread -->
 <div class="grid grid-cols-3 gap-3.5 p-4 border-y border-gray-200 dark:border-white/10 shrink-0">
     <!-- 'All' Filter -->
     <div class="relative">
@@ -55,7 +55,7 @@
         </span>
     </div>
 
-    <!-- 'Unread' Filter -->
+    <!-- 'Unread' Filter (Amber High-Visibility Action Beacon) -->
     <div class="relative">
         <x-filament::button
             wire:click="setTab('unread')"
@@ -67,7 +67,7 @@
             Unread
         </x-filament::button>
         @if($this->unreadCount > 0)
-        <span class="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-danger-500 px-1 text-[9px] font-extrabold text-white shadow-sm ring-2 ring-white dark:ring-gray-900 pointer-events-none animate-pulse">
+        <span class="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-warning-500 px-1 text-[9px] font-extrabold text-white shadow-sm ring-2 ring-white dark:ring-gray-900 pointer-events-none animate-pulse">
             {{ $this->unreadCount }}
         </span>
         @endif
@@ -89,21 +89,22 @@
         </span>
     </div>
 </div>
+
 <!-- Scrollable List -->
 <div wire:poll.10s class="flex-1 overflow-y-auto divide-y divide-gray-100 dark:divide-white/5">
     @forelse($this->threads as $thread)
-   <button
+    <button
         type="button"
         wire:key="thread-{{ $thread->id }}"
         wire:click="loadThread({{ $thread->id }})"
         wire:loading.attr="disabled"
-        class="w-full text-left group relative flex gap-4 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-white/5 transition-colors {{ $activeThreadId === $thread->id ? 'bg-primary-50/50 dark:bg-primary-900/10' : '' }} disabled:opacity-50 disabled:cursor-not-allowed">
+        class="w-full text-left group relative flex gap-4 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-white/5 transition-colors {{ $activeThreadId === $thread->id ? 'bg-primary-50/70 dark:bg-primary-500/15' : '' }} disabled:opacity-50 disabled:cursor-not-allowed">
 
         @if($activeThreadId === $thread->id)
-        <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary-600 rounded-r-full"></div>
+        <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary-600 dark:bg-primary-400 rounded-r-full"></div>
         @endif
 
-        <!-- Avatar (Strictly Primary Color) -->
+        <!-- Avatar (5-Palette Contrast Compliant) -->
         <div class="relative shrink-0 mt-1">
             <div class="flex items-center justify-center w-10 h-10 rounded-full font-bold text-sm {{ $this->getAvatarColor($thread->client->id) }}">
                 {{ strtoupper(substr($thread->client->first_name, 0, 1)) }}{{ strtoupper(substr($thread->client->last_name ?? '', 0, 1)) }}
@@ -116,7 +117,8 @@
         <!-- Content -->
         <div class="flex-1 min-w-0">
             <div class="flex justify-between items-baseline mb-0.5">
-                <h3 class="truncate pr-2 text-sm {{ $thread->is_unread ? 'font-bold text-gray-900 dark:text-white' : 'font-medium text-gray-700 dark:text-gray-300' }}">
+                <h3 class="truncate pr-2 text-sm {{ $thread->is_unread ? 'font-bold text-gray-900 dark:text-white' : 'font-medium text-gray-700 dark:text-gray-300' }}"
+                    title="{{ $thread->client->first_name }} {{ $thread->client->last_name }}">
                     {{ $thread->client->first_name }} {{ $thread->client->last_name }}
                 </h3>
                 <span class="shrink-0 text-[11px] text-gray-500 whitespace-nowrap">
@@ -125,10 +127,12 @@
             </div>
 
             <div class="flex items-center justify-between gap-2">
-                <p class="text-[13px] leading-tight truncate {{ $thread->is_unread ? 'font-semibold text-gray-800 dark:text-gray-200' : 'text-gray-500 dark:text-gray-400' }}">
-                    {{ $thread->subject ?? 'No Subject' }}
+                <p class="text-[13px] leading-tight truncate {{ $thread->is_unread ? 'font-semibold text-gray-800 dark:text-gray-200' : 'text-gray-500 dark:text-gray-400' }}"
+                   title="{{ $thread->subject ?? 'No Subject' }}">
+                    {{ str($thread->subject ?? 'No Subject')->limit(30) }}
                 </p>
 
+                <!-- Unread Indicator (Amber Pulse Beacon) -->
                 @if($thread->is_unread)
                 <div class="shrink-0 w-2 h-2 rounded-full bg-primary-600 shadow-[0_0_8px_rgba(var(--primary-600),0.6)]"></div>
                 @endif

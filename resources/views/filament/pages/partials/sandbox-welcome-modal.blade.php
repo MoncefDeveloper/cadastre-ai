@@ -11,7 +11,7 @@
     <x-filament::modal id="sandbox-welcome-modal" width="2xl">
         <x-slot name="heading">
             <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
+                <div class="w-9 h-9 rounded-xl bg-primary-500/10 text-primary-600 dark:text-primary-400 flex items-center justify-center">
                     <x-heroicon-m-sparkles class="w-5 h-5" />
                 </div>
                 <div>
@@ -23,8 +23,8 @@
 
         <div class="space-y-4 pr-1 pb-2">
 
-            <!-- 1. Top Callout: Sandbox Status (Info) -->
-            <x-filament::callout color="info" icon="heroicon-o-shield-check">
+            <!-- 1. Top Callout: Sandbox Status (Aligned to Primary Carmine) -->
+            <x-filament::callout color="primary" icon="heroicon-o-shield-check">
                 <x-slot name="heading">
                     <span class="font-bold text-xs">Live Sandbox Playground Active</span>
                 </x-slot>

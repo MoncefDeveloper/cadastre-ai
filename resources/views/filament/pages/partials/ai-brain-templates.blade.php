@@ -1,4 +1,4 @@
-<div x-show="aiBrainTab === 'templates'" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-4 pb-10">
+<div x-show="aiBrainTab === 'templates'" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-4 pb-6">
 
     <!-- Filters -->
     <div class="grid grid-cols-2 gap-3 mb-4">
@@ -23,66 +23,69 @@
     <!-- Templates List -->
     <div class="space-y-3">
         @forelse($this->availableTemplates as $template)
-            <!-- Tooltip Wrapper (Alpine) - Added dynamic z-index so hover overlaps elements below -->
-            <div x-data="{ showPreview: false }" class="relative" @mouseenter="showPreview = true" @mouseleave="showPreview = false" :class="{ 'z-50': showPreview, 'z-10': !showPreview }">
+            <!-- Interactive Card with Smooth Inline Blueprint Accordion -->
+            <div x-data="{ expanded: false }" class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-shadow">
 
-                <!-- The Card -->
-                <div class="flex bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
-
-                    <!-- Left Color Block (Category) - Fixed Text Orientation -->
-                    <div class="w-8 flex items-center justify-center bg-{{ $template->category?->color ?? 'gray' }}-50 dark:bg-{{ $template->category?->color ?? 'gray' }}-900/30 border-r border-gray-100 dark:border-white/5 shrink-0 py-3">
-                        <span class="text-[9px] font-bold text-{{ $template->category?->color ?? 'gray' }}-600 dark:text-{{ $template->category?->color ?? 'gray' }}-400 uppercase tracking-widest truncate max-h-full" style="writing-mode: vertical-lr; transform: rotate(180deg);">
-                            {{ $template->category?->name ?? 'Global' }}
+                <div class="p-4">
+                    <!-- Top Row: Category Badge (size="md") & Channel Icon -->
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                        @php
+                            $catColor = $template->category?->color ?? '#64748b';
+                        @endphp
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold"
+                              style="background-color: {{ $catColor }}18; color: {{ $catColor }}; border: 1px solid {{ $catColor }}30;">
+                            {{ $template->category?->name ?? 'Global Template' }}
                         </span>
+
+                        <div class="shrink-0">
+                            @if($template->channel->value === 1)
+                                <x-heroicon-m-envelope class="w-4 h-4 text-gray-400" title="Email Template" />
+                            @elseif($template->channel->value === 2)
+                                <x-heroicon-m-chat-bubble-left-right class="w-4 h-4 text-emerald-500" title="WhatsApp Template" />
+                            @endif
+                        </div>
                     </div>
 
-                    <!-- Right Content -->
-                    <div class="p-3 flex-1 flex flex-col justify-between min-w-0">
+                    <!-- Template Title & Inline Toggle Button -->
+                    <div class="mb-2">
+                        <h4 class="font-bold text-sm text-gray-900 dark:text-white leading-tight flex items-center justify-between gap-2">
+                            <span class="truncate">{{ $template->name }}</span>
+
+                            <button type="button"
+                                    @click="expanded = !expanded"
+                                    class="text-gray-400 hover:text-primary-500 p-1 rounded-md transition-colors shrink-0"
+                                    :title="expanded ? 'Hide Blueprint' : 'View Blueprint'">
+                                <x-heroicon-m-information-circle class="w-4 h-4" />
+                            </button>
+                        </h4>
+                        <p class="text-xs text-gray-500 truncate mt-1">{{ $template->prompt }}</p>
+                    </div>
+
+                    <!-- Expandable Inline Blueprint Drawer (Works on Mobile & Desktop) -->
+                    <div x-show="expanded" x-collapse x-cloak class="my-3 p-3 rounded-lg bg-gray-50 dark:bg-white/[0.03] border border-gray-200 dark:border-white/5 text-xs space-y-2">
                         <div>
-                            <div class="flex justify-between items-start mb-1">
-                                <h4 class="font-bold text-sm text-gray-900 dark:text-white leading-tight flex items-center gap-1.5 cursor-help truncate">
-                                    <span class="truncate">{{ $template->name }}</span>
-                                    <x-heroicon-o-information-circle class="w-4 h-4 text-gray-400 hover:text-primary-500 transition-colors shrink-0" />
-                                </h4>
-                                <!-- Channel Icon -->
-                                <div class="shrink-0 ml-2">
-                                    @if($template->channel->value === 1)
-                                        <x-heroicon-m-envelope class="w-4 h-4 text-gray-400" title="Email Template" />
-                                    @elseif($template->channel->value === 2)
-                                        <x-heroicon-m-chat-bubble-left-right class="w-4 h-4 text-green-500" title="WhatsApp Template" />
-                                    @endif
-                                </div>
-                            </div>
-                            <p class="text-xs text-gray-500 truncate">{{ $template->prompt }}</p>
+                            <span class="font-bold uppercase text-[10px] text-primary-600 dark:text-primary-400 tracking-wider">System Identity:</span>
+                            <p class="italic text-gray-600 dark:text-gray-300 mt-0.5 leading-relaxed">{{ $template->system_instructions ?? 'Standard Real Estate Advisor' }}</p>
                         </div>
-
-                        <!-- Fixed Badge Wrapping -->
-                        <div class="flex items-center justify-between mt-3 pt-2 border-t border-gray-50 dark:border-white/5">
-                            <span class="text-[10px] font-medium text-gray-500 bg-gray-100 dark:bg-white/5 px-2 py-1 rounded-md flex items-center gap-1.5 whitespace-nowrap">
-                                <x-heroicon-m-fire class="w-3 h-3 text-orange-500 shrink-0" />
-                                Used {{ $template->usage_count }} times
-                            </span>
-
-                            <x-filament::button wire:click="applyTemplate({{ $template->id }})" size="xs" color="primary" class="!px-3 shrink-0 ml-2">
-                                Apply
-                            </x-filament::button>
+                        <div>
+                            <span class="font-bold uppercase text-[10px] text-primary-600 dark:text-primary-400 tracking-wider">Prompt Blueprint:</span>
+                            <p class="text-gray-600 dark:text-gray-300 mt-0.5 leading-relaxed">{{ $template->prompt }}</p>
                         </div>
+                    </div>
+
+                    <!-- Bottom Bar: Usage Metric & Apply Button -->
+                    <div class="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-white/5 mt-2">
+                        <span class="text-[10px] font-medium text-gray-500 bg-gray-100 dark:bg-white/5 px-2 py-1 rounded-md flex items-center gap-1.5 whitespace-nowrap">
+                            <x-heroicon-m-fire class="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                            Used {{ $template->usage_count }} times
+                        </span>
+
+                        <x-filament::button wire:click="applyTemplate({{ $template->id }})" size="xs" color="primary" class="!px-3 shrink-0">
+                            Apply
+                        </x-filament::button>
                     </div>
                 </div>
 
-                <!-- Hover Preview Popover (Fixed Position to drop down) -->
-                <div x-show="showPreview" x-transition.opacity.duration.200ms x-cloak class="absolute left-0 top-full mt-2 w-full bg-gray-900 dark:bg-gray-800 text-white text-xs rounded-xl p-4 shadow-2xl ring-1 ring-white/10 pointer-events-none">
-                    <!-- Arrow pointer -->
-                    <div class="absolute -top-1.5 left-8 w-3 h-3 bg-gray-900 dark:bg-gray-800 rotate-45 ring-1 ring-white/10 ring-b-0 ring-r-0"></div>
-
-                    <div class="relative z-10">
-                        <p class="font-bold text-primary-400 mb-1 uppercase tracking-wider text-[10px]">System Instructions:</p>
-                        <p class="mb-3 italic text-gray-300 leading-relaxed">{{ str($template->system_instructions)->limit(120) }}</p>
-
-                        <p class="font-bold text-primary-400 mb-1 uppercase tracking-wider text-[10px]">Prompt Rules:</p>
-                        <p class="text-gray-300 leading-relaxed">{{ str($template->prompt)->limit(180) }}</p>
-                    </div>
-                </div>
             </div>
         @empty
             <div class="p-6 text-center text-gray-400 border border-dashed border-gray-200 dark:border-white/10 rounded-xl">
@@ -91,4 +94,22 @@
             </div>
         @endforelse
     </div>
+
+    <!-- Full-Width Outlined Action Button to Manage & Add Templates -->
+    @can('ViewAny:Template')
+    <div class="pt-2">
+        <x-filament::button
+            tag="a"
+            href="{{ \App\Filament\Resources\Templates\TemplateResource::getUrl('index') }}"
+            target="_blank"
+            color="primary"
+            outlined
+            size="sm"
+            icon="heroicon-m-plus"
+            class="w-full justify-center">
+            Manage & Add Templates
+        </x-filament::button>
+    </div>
+    @endcan
+
 </div>

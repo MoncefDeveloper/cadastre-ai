@@ -11,12 +11,12 @@
             <!-- Dynamic Badges -->
             <div class="flex flex-wrap gap-1.5">
                 @if($this->activeThread()->extracted_criteria['is_property_inquiry'] ?? false)
-                <x-filament::badge color="success" size="sm">Qualified Lead</x-filament::badge>
+                <x-filament::badge color="success" size="md">Qualified Lead</x-filament::badge>
                 @endif
 
                 @if(isset($this->activeThread()->extracted_criteria['listing_type']))
                 @php $type = $this->activeThread()->extracted_criteria['listing_type']; @endphp
-                <x-filament::badge color="{{ $type === 'sale' ? 'info' : 'warning' }}" size="sm">
+                <x-filament::badge color="{{ $type === 'sale' ? 'info' : 'warning' }}" size="md">
                     {{ ucfirst($type) }}
                 </x-filament::badge>
                 @endif

@@ -2,7 +2,7 @@
     <button
         type="button"
         @click="$dispatch('open-modal', { id: 'inbound-simulator-modal' })"
-        class="group flex items-center gap-3 px-4 py-2 rounded-full border border-gray-200/80 dark:border-white/10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-2xl hover:shadow-amber-500/10 hover:border-amber-500/40 dark:hover:border-amber-500/40 transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
+        class="group flex items-center gap-3 px-4 py-2 rounded-full border border-gray-200/80 dark:border-white/10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-2xl hover:shadow-primary-500/10 hover:border-primary-500/40 dark:hover:border-primary-500/40 transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
     >
         <!-- Radar Pulse Indicator -->
         <div class="flex items-center gap-2">
@@ -16,9 +16,9 @@
         <!-- Divider -->
         <span class="text-gray-300 dark:text-gray-700 select-none">&bull;</span>
 
-        <!-- Action Trigger with Amber Accents -->
-        <div class="flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 group-hover:text-amber-500">
-            <x-heroicon-m-bolt class="w-4 h-4 group-hover:animate-bounce" />
+        <!-- Action Trigger with Carmine Accents -->
+        <div class="flex items-center gap-1.5 text-xs font-bold text-primary-600 dark:text-primary-400 group-hover:text-primary-500">
+            <x-heroicon-m-bolt class="w-4 h-4 group-hover:animate-bounce text-primary-500" />
             <span>Simulate Inbound Lead (Webhook)</span>
             <x-heroicon-m-arrow-up-right class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </div>

@@ -1,17 +1,35 @@
 /* ==========================================================================
-   DARK MODE: Chassis, .fi-main & Active Sidebar Tab (oklch 258° Surface)
+   DARK MODE: Ambient Carmine Chassis & Elevated Canvas
    ========================================================================== */
 
-/* 1. Base Dark Chassis (Sidebar & Topbar Frame) */
-.dark body,
+/* 1. Ambient Primary Carmine Mesh Gradient (+10% Space Expansion) */
+.dark body {
+    background-color: #05070b !important;
+    background-image: 
+        radial-gradient(ellipse 75% 65% at 0% 0%, rgba(190, 18, 60, 0.15) 0%, rgba(95, 17, 39, 0.07) 55%, transparent 100%),
+        radial-gradient(circle at 18% 28%, rgba(190, 18, 60, 0.07) 0%, transparent 60%) !important;
+    background-attachment: fixed !important;
+    background-repeat: no-repeat !important;
+}
+
+/* 2. Transparent Shell: Allows the ambient glow to breathe through Sidebar and Topbar */
 .dark .fi-layout,
 .dark .fi-topbar,
 .dark .fi-sidebar {
-    background-color: #05070b !important;
+    background-color: transparent !important;
     border-right: none !important;
+    border-bottom: none !important;
 }
 
-/* 2. Main Content Canvas (.fi-main) - Expanded State (Flat Right Edge) */
+/* 2b. Mobile Drawer Safeguard: Keeps off-canvas drawer solid on phones/tablets */
+@media (max-width: 1023px) {
+    .dark .fi-sidebar {
+        background-color: #0d1117 !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7) !important;
+    }
+}
+
+/* 3. Main Content Canvas (.fi-main) - Expanded State */
 .dark .fi-main {
     background-color: oklch(17.629% 0.01404 258.383 / 0.4) !important;
     border: 1px solid rgba(245, 182, 182, 0.07) !important;
@@ -25,36 +43,56 @@
     transition: border-radius 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* 2b. Collapsed State: Restores normal symmetrical curves on right side */
+/* 3b. Main Content Canvas (.fi-main) - Collapsed State (Curves restored on right) */
 .dark .fi-main-ctn:not(.fi-main-ctn-sidebar-open) .fi-main {
     border-radius: 1.25rem !important;
     border-top-right-radius: 1.25rem !important;
     border-bottom-right-radius: 1.25rem !important;
 }
 
-/* 3. Active Sidebar Tab Pill (Matching Elevated oklch Surface) */
+/* 4. Active Sidebar Tab Pill (Translucent Frosted Glass: lets ambient glow bleed through) */
 .dark .fi-sidebar-item-active a,
 .dark .fi-sidebar-item.fi-active a,
 .dark .fi-sidebar-item-active .fi-sidebar-item-button {
-    background-color: oklch(0.176 0.014 258.357) !important;
+    background-color: oklch(17.629% 0.01404 258.383 / 0.55) !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
     border-radius: 0.75rem !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
 }
 
 /* ==========================================================================
-   LIGHT MODE: Chassis, .fi-main & Active Sidebar Tab
+   LIGHT MODE: Ambient Carmine Rose Bloom on Slate-100 Chassis
    ========================================================================== */
 
-/* 1. Base Light Chassis (Slate-100 Outer Shell) */
-html:not(.dark) body,
+/* 1. Base Light Canvas with Subtle Carmine Bloom */
+html:not(.dark) body {
+    background-color: #f1f5f9 !important;
+    background-image: 
+        radial-gradient(ellipse 75% 65% at 0% 0%, rgba(190, 18, 60, 0.075) 0%, rgba(251, 113, 139, 0.025) 55%, transparent 100%),
+        radial-gradient(circle at 18% 28%, rgba(190, 18, 60, 0.035) 0%, transparent 60%) !important;
+    background-attachment: fixed !important;
+    background-repeat: no-repeat !important;
+}
+
+/* 2. Transparent Shell in Light Mode */
 html:not(.dark) .fi-layout,
 html:not(.dark) .fi-topbar,
 html:not(.dark) .fi-sidebar {
-    background-color: #f1f5f9 !important;
+    background-color: transparent !important;
     border-right: none !important;
+    border-bottom: none !important;
 }
 
-/* 2. Main Content Canvas - Expanded State (Flat Right Edge) */
+/* 2b. Mobile Drawer Safeguard in Light Mode */
+@media (max-width: 1023px) {
+    html:not(.dark) .fi-sidebar {
+        background-color: #ffffff !important;
+        box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.08) !important;
+    }
+}
+
+/* 3. Main Content Canvas - Expanded State */
 html:not(.dark) .fi-main {
     background-color: #ffffff60 !important;
     border: 1px solid #e2e8f0 !important;
@@ -65,21 +103,28 @@ html:not(.dark) .fi-main {
     margin-bottom: 1rem !important;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04) !important;
     min-height: calc(100vh - 4.5rem) !important;
-    transition: border-radius 0.25s cubic-bezier(0.4, 0, 0.2, 1), margin-right 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: border-radius 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* 2b. Collapsed State: Restores normal symmetrical curves on right side */
+/* 3b. Main Content Canvas - Collapsed State */
 html:not(.dark) .fi-main-ctn:not(.fi-main-ctn-sidebar-open) .fi-main {
     border-radius: 1.25rem !important;
     border-top-right-radius: 1.25rem !important;
     border-bottom-right-radius: 1.25rem !important;
 }
 
-/* 3. Active Sidebar Tab Pill (Pure White Elevated Card on Slate-100) */
+/* 4. Active Sidebar Tab Pill (Translucent Frosted Glass in Light Mode) */
 html:not(.dark) .fi-sidebar-item-active a,
 html:not(.dark) .fi-sidebar-item.fi-active a,
 html:not(.dark) .fi-sidebar-item-active .fi-sidebar-item-button {
-    background-color: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
+    background-color: rgba(255, 255, 255, 0.65) !important;
+    border: 1px solid rgba(226, 232, 240, 0.8) !important;
     border-radius: 0.75rem !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+}
+
+/* Ensure Topbar-spawned modals sit above all page content */
+.fi-topbar:has([role="dialog"]) {
+    z-index: 50 !important;
 }

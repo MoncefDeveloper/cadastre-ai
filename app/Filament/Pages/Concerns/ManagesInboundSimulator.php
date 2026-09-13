@@ -59,11 +59,13 @@ trait ManagesInboundSimulator
                             ->columnSpanFull(),
                     ])
                     ->footerActions([
+                        // Action configured to span full width across the form card
                         Action::make('dispatchWebhook')
                             ->label('Dispatch Inbound Webhook Payload')
                             ->icon('heroicon-m-paper-airplane')
                             ->color('primary')
                             ->outlined()
+                            ->extraAttributes(['class' => 'w-full justify-center'])
                             ->action('simulateCustomLead'),
                     ])
                     ->footerActionsAlignment(Alignment::Center)
@@ -78,7 +80,6 @@ trait ManagesInboundSimulator
             'name' => 'Dr. Malik Mansoor',
             'email' => 'info+custom@moncefdev.me',
             'subject' => 'Inquiry: Luxury Waterfront Property with Immediate Acquisition',
-            // 👈 Rebranded to Cadastre Team
             'body' => "Hello Cadastre Team,\n\nWe are looking for a luxury waterfront villa with a private pool and sea view in Oran (Canastel) or Nice. Our maximum budget is $5,000,000.\n\nPlease share suitable listings and availability for an on-site private viewing.",
         ]);
     }
@@ -90,7 +91,6 @@ trait ManagesInboundSimulator
                 'name' => 'Ambassadorial Office',
                 'email' => 'info+hydra@moncefdev.me',
                 'subject' => 'Diplomatic Residence Requirement — 6 Bedroom Compound in Hydra',
-                // 👈 Rebranded to Cadastre Private Office
                 'body' => "Dear Cadastre Private Office,\n\nOur delegation requires an ambassadorial villa in Hydra, Algiers with a minimum of 6 bedrooms, high-security perimeter walls, heated private swimming pool, and underground parking.\n\nOur capital budget allocation is up to $5,000,000. When can we coordinate an architectural inspection?",
             ],
             'paris' => [

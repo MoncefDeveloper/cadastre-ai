@@ -20,18 +20,27 @@
                     x-transition:leave="transition ease-in duration-200"
                     x-transition:leave-start="opacity-100 scale-100 translate-x-0"
                     x-transition:leave-end="opacity-0 scale-75 -translate-x-4"
-                    class="shrink-0 flex items-center justify-center w-8 h-8 rounded-md border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors shadow-sm"
+                    class="shrink-0 flex items-center justify-center w-8 h-8 rounded-md border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors shadow-xs"
                     title="Open Inbox"
                     type="button">
                     <x-heroicon-o-bars-3 class="w-4 h-4" />
                 </button>
                 <div class="min-w-0 flex-1">
-                    <h2 class="font-bold text-base text-gray-900 dark:text-white leading-tight truncate">
-                        {{ $this->activeThread()->subject }}
+                    <!-- Subject Truncated at 40 Characters Max with Hover Tooltip -->
+                    <h2 class="font-bold text-base text-gray-900 dark:text-white leading-tight truncate"
+                        title="{{ $this->activeThread()->subject }}">
+                        {{ str($this->activeThread()->subject ?? 'No Subject')->limit(40) }}
                     </h2>
-                    <p class="text-xs text-gray-500 mt-0.5 truncate">
-                        {{ $this->activeThread()->client->first_name }} <span class="opacity-70">&lt;{{ $this->activeThread()->client->email }}&gt;</span>
-                    </p>
+
+                    <!-- Client Name & Email in Standard md Badge -->
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <span class="text-xs font-semibold text-gray-700 dark:text-gray-300 truncate">
+                            {{ $this->activeThread()->client->first_name }} {{ $this->activeThread()->client->last_name }}
+                        </span>
+                        <x-filament::badge color="gray" size="md">
+                            {{ $this->activeThread()->client->email }}
+                        </x-filament::badge>
+                    </div>
                 </div>
             </div>
 
@@ -40,34 +49,34 @@
                 <button
                     type="button"
                     wire:click="markAsUnread"
-                    class="group flex items-center gap-1.5 h-9 px-3 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-primary-600 dark:hover:text-primary-400 hover:border-primary-300 dark:hover:border-primary-800/50 transition-all shadow-sm text-xs font-bold">
-                    <x-heroicon-m-envelope class="w-4 h-4 text-gray-400 group-hover:text-primary-500 transition-colors" />
+                    class="group flex items-center gap-1.5 h-9 px-3 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-all shadow-xs text-xs font-bold">
+                    <x-heroicon-m-envelope class="w-4 h-4 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200 transition-colors" />
                     <span>Unread</span>
                 </button>
 
                 <button
                     type="button"
                     @click="aiBrainOpen = true; aiBrainTab = 'ai'"
-                    class="group flex items-center gap-1.5 h-9 px-3 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-primary-600 dark:hover:text-primary-400 hover:border-primary-300 dark:hover:border-primary-800/50 transition-all shadow-sm text-xs font-bold"
+                    class="group flex items-center gap-1.5 h-9 px-3 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:border-primary-500/40 dark:hover:border-primary-500/40 transition-all shadow-xs text-xs font-bold"
                     title="Open AI Copilot Insights">
-                    <x-heroicon-o-cpu-chip class="w-4 h-4 text-primary-500 group-hover:animate-pulse" />
-                    <span>AI</span>
+                    <x-heroicon-o-cpu-chip class="w-4 h-4 text-rose-500 dark:text-rose-400 group-hover:animate-pulse" />
+                    <span class="group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">AI</span>
                 </button>
 
                 <button
                     type="button"
                     @click="aiBrainOpen = true; aiBrainTab = 'info'"
-                    class="group flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-primary-600 dark:hover:text-primary-400 hover:border-primary-300 dark:hover:border-primary-800/50 transition-all shadow-sm"
+                    class="group flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-all shadow-xs"
                     title="Client Info">
-                    <x-heroicon-o-user class="w-4 h-4 text-gray-400 group-hover:text-primary-500 transition-colors" />
+                    <x-heroicon-o-user class="w-4 h-4 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200 transition-colors" />
                 </button>
 
                 <button
                     type="button"
                     @click="$dispatch('open-modal', { id: 'sandbox-welcome-modal' })"
-                    class="group relative flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-primary-600 dark:hover:text-primary-400 hover:border-primary-300 dark:hover:border-primary-800/50 transition-all shadow-sm"
+                    class="group relative flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-white/5 transition-all shadow-xs"
                     title="Testing Guide & Sandbox Architecture">
-                    <x-heroicon-o-hand-raised class="w-4 h-4 text-amber-500 animate-waving-hand group-hover:scale-110" />
+                    <x-heroicon-o-hand-raised class="w-4 h-4 text-amber-500 animate-waving-hand group-hover:scale-110 transition-transform" />
 
                     <span class="absolute -top-0.5 -right-0.5 flex h-2 w-2">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
@@ -100,12 +109,12 @@
             </div>
         </div>
 
-        <!-- Chat History (Email Cards with Shadow DOM Boundary) -->
-        <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/50 dark:bg-[#0f1115]">
+        <!-- Chat History (Messages Rendered Newest First) -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-100/60 dark:bg-gray-950/40">
             @foreach($this->activeThread()->messages as $message)
             @if($message->is_draft) @continue @endif
 
-            <div wire:key="msg-{{ $message->id }}" class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl shadow-sm overflow-hidden">
+            <div wire:key="msg-{{ $message->id }}" class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl shadow-xs overflow-hidden">
                 <div class="flex justify-between items-start p-4 border-b border-gray-100 dark:border-white/5 bg-gray-50/30 dark:bg-white/[0.02]">
                     <div class="flex items-center gap-3">
                         @if($message->direction->value === 1)
@@ -127,7 +136,7 @@
                     <div class="text-xs text-gray-400 whitespace-nowrap">{{ $message->created_at->format('M d, g:i A') }}</div>
                 </div>
 
-                <!-- Mandatory Shadow DOM Container -->
+                <!-- Mandatory Shadow DOM Container with Adaptive Carmine Link Reset -->
                 <div class="p-5 text-sm text-gray-700 dark:text-gray-300 w-full overflow-hidden"
                     x-data="{ html: @js($message->body_html ?? nl2br(e($message->body_text))) }"
                     x-init="
@@ -140,7 +149,15 @@
                                     font-family: inherit !important;
                                 }
                                 p { margin-top: 0; margin-bottom: 1em; }
-                                a { color: #3b82f6 !important; text-decoration: underline !important; }
+                                a {
+                                    color: var(--color-primary-600, #be123c) !important;
+                                    text-decoration: underline !important;
+                                    font-weight: 600;
+                                }
+                                @media (prefers-color-scheme: dark) {
+                                    a { color: var(--color-primary-400, #fb7185) !important; }
+                                }
+                                :host-context(.dark) a { color: var(--color-primary-400, #fb7185) !important; }
                                 ul, ol { margin-top: 0; margin-bottom: 1em; padding-left: 20px; }
                                 h1, h2, h3, h4, h5, h6 { font-weight: bold; margin-bottom: 0.5em; }
                                 img { max-width: 100%; height: auto; display: block; }
@@ -152,7 +169,7 @@
             @endforeach
         </div>
 
-        <!-- Dynamic Border UI Composer -->
+        <!-- Dynamic Border UI Composer (Emerald Green Success Mapping) -->
         <div
             x-data="{
                 composerHeight: null,
@@ -163,7 +180,7 @@
             :style="
                 `max-height: 45vh;` +
                 (composerHeight ? `height: ${composerHeight}px;` : 'height: auto;') +
-                (@js($ratingResult) ? `border: 2px solid hsl(${$wire.ratingResult.score * 12}, 75%, 45%) !important;` : '')
+                (@js($ratingResult) ? `border: 2px solid ${ $wire.ratingResult.score >= 8 ? '#10b981' : ($wire.ratingResult.score >= 5 ? '#f59e0b' : '#ef4444') } !important;` : '')
             "
             class="composer-container bg-white dark:bg-gray-900 shadow-[0_-4px_10px_rgba(0,0,0,0.02)] flex flex-col relative shrink-0 overflow-hidden {{ !$ratingResult ? 'border-t border-gray-200 dark:border-white/10' : 'rounded-b-xl' }}">
 
@@ -204,7 +221,8 @@
                 class="flex flex-col h-full p-4 relative z-10">
                 <div class="mb-2 shrink-0 flex items-center h-7 gap-3 pb-2">
                     <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Reply to {{ $this->activeThread()->client->first_name }}</span>
-                    <x-filament::button outlined color="gray" size="xs" icon="heroicon-m-arrow-path" tooltip="Reset height" @click="composerHeight = null" x-show="composerHeight !== null" x-cloak class="scale-85" type="button" />
+                    <!-- Reset Height Button: Primary Color -->
+                    <x-filament::button outlined color="primary" size="xs" icon="heroicon-m-arrow-path" tooltip="Reset height" @click="composerHeight = null" x-show="composerHeight !== null" x-cloak class="scale-85" type="button" />
 
                     <!-- Header Actions Group -->
                     <div class="ml-auto flex items-center gap-2">
@@ -235,14 +253,14 @@
                         </x-filament::button>
                         @endif
 
-                        <!-- 3. Grade Draft / Re-Grade Button -->
+                        <!-- 3. Grade Draft Button: Success Color -->
                         <x-filament::button
                             wire:click="rateCurrentDraft"
                             wire:loading.attr="disabled"
                             wire:target="rateCurrentDraft"
                             x-bind:disabled="!hasContent || $wire.isRating"
                             tooltip="Evaluate draft against FHA & Quality Rules"
-                            outlined color="info" size="xs" icon="heroicon-m-cpu-chip" class="{{ $ratingResult ? 'scale-90' : '' }}"
+                            outlined color="success" size="xs" icon="heroicon-m-cpu-chip" class="{{ $ratingResult ? 'scale-90' : '' }}"
                             type="button">
                             {{ $ratingResult ? 'Re-Grade' : 'Grade Draft' }}
                         </x-filament::button>
@@ -254,10 +272,18 @@
                 </div>
 
                 <div class="flex justify-between items-center mt-3 shrink-0 pt-2 border-t border-gray-100 dark:border-white/5">
-                    <div class="text-xs text-gray-400 flex items-center gap-1">
-                        <x-heroicon-o-sparkles class="w-3.5 h-3.5" />
-                        Open 'AI Insights' to generate or paste a draft.
+                    <!-- Footer Helper: Clickable AI Insights Badge in Primary Color -->
+                    <div class="text-xs text-gray-400 flex items-center gap-1.5">
+                        <x-heroicon-o-sparkles class="w-4 h-4 text-primary-500 shrink-0" />
+                        <span>Open</span>
+                        <button type="button" @click="aiBrainOpen = true; aiBrainTab = 'ai'" class="cursor-pointer focus:outline-hidden hover:scale-105 transition-transform">
+                            <x-filament::badge color="primary" size="md">
+                                AI Insights
+                            </x-filament::badge>
+                        </button>
+                        <span>to generate or paste a draft.</span>
                     </div>
+
                     <x-filament::button
                         type="submit"
                         color="primary"
@@ -272,12 +298,19 @@
             </form>
         </div>
 
-        <!-- EVALUATION MODAL -->
+        <!-- EVALUATION MODAL (Emerald Green Grade Stamp) -->
         <x-filament::modal id="rate-details-modal" width="2xl">
             @if($ratingResult)
+            @php
+                $gradeColor = match(true) {
+                    $ratingResult['score'] >= 8 => '#10b981', // Emerald (matches Filament success)
+                    $ratingResult['score'] >= 5 => '#f59e0b', // Amber (matches Filament warning)
+                    default => '#ef4444',                     // Coral Red (matches Filament danger)
+                };
+            @endphp
             <x-slot name="heading">
                 <div class="flex items-center gap-3">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-xl text-white font-black text-xl shadow-inner" style="background-color: hsl({{ $ratingResult['score'] * 12 }}, 75%, 45%);">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-xl text-white font-black text-xl shadow-inner" style="background-color: {{ $gradeColor }};">
                         {{ $ratingResult['grade'] }}
                     </div>
                     <div>
@@ -350,7 +383,6 @@
             </x-slot>
 
             <div class="space-y-4 pr-2 pb-6">
-                <!-- 👈 Updated from matchmaker-rules to cadastre-rules -->
                 @foreach(config('cadastre-rules', []) as $section)
                 <x-filament::section icon="heroicon-o-shield-check" collapsible>
                     <x-slot name="heading">

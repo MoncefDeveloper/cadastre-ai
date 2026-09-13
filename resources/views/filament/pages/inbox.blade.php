@@ -19,7 +19,7 @@
         }
 
         .dark .ai-generated-prose a {
-            color: #60a5fa !important;
+            color: var(--color-primary-400, #fb7185) !important;
         }
 
         .ai-generated-prose div[style*="border"] {
@@ -29,11 +29,11 @@
         }
     </style>
 
-    <!-- App Container -->
+    <!-- App Container (Dynamic Viewport & Responsive Sidebar State) -->
     <div
-        x-data="{ sidebarOpen: true, aiBrainOpen: false, aiBrainTab: 'info' }"
+        x-data="{ sidebarOpen: window.innerWidth >= 1024, aiBrainOpen: false, aiBrainTab: 'info' }"
         x-on:open-ai-tab.window="aiBrainOpen = true; aiBrainTab = 'ai'"
-        class="flex w-full gap-4 h-[calc(100vh-8rem)] relative">
+        class="flex w-full gap-4 h-[calc(100dvh-8rem)] relative">
         <!-- COLUMN 1: INBOX LIST (Absolute on mobile, relative on large screens) -->
         <div
             x-show="sidebarOpen"
@@ -43,7 +43,7 @@
             x-transition:leave="transition ease-in duration-300"
             x-transition:leave-start="opacity-100 translate-x-0"
             x-transition:leave-end="opacity-0 -translate-x-full"
-            class="absolute lg:relative z-30 inset-y-0 left-0 w-80 lg:w-1/4 lg:min-w-[300px] flex flex-col bg-white dark:bg-gray-900 rounded-xl shadow-2xl lg:shadow-sm ring-1 ring-gray-950/5 dark:ring-white/10">
+            class="absolute lg:relative z-20 lg:z-auto inset-y-0 left-0 w-80 lg:w-1/4 lg:min-w-[300px] flex flex-col bg-white dark:bg-gray-900 rounded-xl shadow-2xl lg:shadow-sm ring-1 ring-gray-950/5 dark:ring-white/10">
             @include('filament.pages.partials.inbox-list')
         </div>
 
@@ -72,8 +72,8 @@
             x-transition.opacity
             class="absolute inset-0 z-20 bg-gray-900/50 backdrop-blur-sm lg:hidden"></div>
     </div>
-    @include('filament.pages.partials.sandbox-welcome-modal')
 
+    @include('filament.pages.partials.sandbox-welcome-modal')
     @include('filament.pages.partials.inbound-simulator-modal')
 
 </x-filament-panels::page>

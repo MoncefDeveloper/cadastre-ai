@@ -62,7 +62,7 @@ class Inbox extends Page implements HasForms
 
     public static function getNavigationBadgeColor(): ?string
     {
-        return 'danger';
+        return 'warning';
     }
 
     public static function getNavigationBadgeTooltip(): ?string
@@ -72,7 +72,6 @@ class Inbox extends Page implements HasForms
 
     public function mount(): void
     {
-        // 🎯 Opens specific thread from Dashboard link if requested
         $requestedThreadId = request()->query('thread');
 
         if ($requestedThreadId && Thread::where('id', $requestedThreadId)->exists()) {
@@ -96,7 +95,8 @@ class Inbox extends Page implements HasForms
 
         return Thread::with([
             'client',
-            'messages' => fn($q) => $q->orderBy('created_at', 'asc'),
+            // Order newest first so recent replies appear at the top of chat history
+            'messages' => fn ($q) => $q->orderBy('created_at', 'desc'),
             'propertyMatches.property.category',
         ])->find($this->activeThreadId);
     }
@@ -110,17 +110,10 @@ class Inbox extends Page implements HasForms
             $thread->update(['is_unread' => false]);
         }
 
-        $lastMessage = $thread?->messages->last();
-        if ($lastMessage && $lastMessage->is_draft) {
-            $this->activeDraft = $lastMessage;
-        } else {
-            $this->activeDraft = null;
-        }
+        // Order-agnostic draft detection: prevents index mismatch when messages are sorted desc
+        $this->activeDraft = $thread?->messages->firstWhere('is_draft', true);
 
-        // STOP ANY ONGOING POLLING IF SWITCHING THREADS
         $this->isGeneratingDraft = false;
-
-        // CLEAR RATING METRICS
         $this->ratingResult = null;
         $this->isRating = false;
 

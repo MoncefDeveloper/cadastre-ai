@@ -11,20 +11,20 @@
         </button>
     </div>
 
-    <!-- Custom Alpine Tabs Navigation (NOW 4 TABS) -->
+    <!-- Custom Alpine Tabs Navigation (Accessible High-Contrast Tokens) -->
     <div class="flex border-b border-gray-200 dark:border-white/10 px-4 pt-2 gap-6 shrink-0 bg-white dark:bg-gray-900 overflow-x-auto no-scrollbar"
         x-on:jump-to-ai-tab.window="aiBrainTab = 'ai'">
-        <button @click="aiBrainTab = 'info'" :class="aiBrainTab === 'info' ? 'border-b-2 border-primary-500 text-primary-600 font-semibold' : 'text-gray-500 hover:text-gray-700 border-b-2 border-transparent'" class="pb-2.5 text-sm transition-colors flex items-center gap-1.5 whitespace-nowrap">
+        <button @click="aiBrainTab = 'info'" :class="aiBrainTab === 'info' ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400 font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border-b-2 border-transparent'" class="pb-2.5 text-sm transition-colors flex items-center gap-1.5 whitespace-nowrap">
             <x-heroicon-o-user class="w-4 h-4" /> Info
         </button>
-        <button @click="aiBrainTab = 'ai'" :class="aiBrainTab === 'ai' ? 'border-b-2 border-primary-500 text-primary-600 font-semibold' : 'text-gray-500 hover:text-gray-700 border-b-2 border-transparent'" class="pb-2.5 text-sm transition-colors flex items-center gap-1.5 whitespace-nowrap">
+        <button @click="aiBrainTab = 'ai'" :class="aiBrainTab === 'ai' ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400 font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border-b-2 border-transparent'" class="pb-2.5 text-sm transition-colors flex items-center gap-1.5 whitespace-nowrap">
             <x-heroicon-o-cpu-chip class="w-4 h-4" /> AI Insights
         </button>
-        <button @click="aiBrainTab = 'properties'" :class="aiBrainTab === 'properties' ? 'border-b-2 border-primary-500 text-primary-600 font-semibold' : 'text-gray-500 hover:text-gray-700 border-b-2 border-transparent'" class="pb-2.5 text-sm transition-colors flex items-center gap-1.5 whitespace-nowrap">
+        <button @click="aiBrainTab = 'properties'" :class="aiBrainTab === 'properties' ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400 font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border-b-2 border-transparent'" class="pb-2.5 text-sm transition-colors flex items-center gap-1.5 whitespace-nowrap">
             <x-heroicon-o-home-modern class="w-4 h-4" /> Properties
         </button>
         @can('apply_legally_binding_templates')
-        <button @click="aiBrainTab = 'templates'" :class="aiBrainTab === 'templates' ? 'border-b-2 border-primary-500 text-primary-600 font-semibold' : 'text-gray-500 hover:text-gray-700 border-b-2 border-transparent'" class="pb-2.5 text-sm transition-colors flex items-center gap-1.5 whitespace-nowrap">
+        <button @click="aiBrainTab = 'templates'" :class="aiBrainTab === 'templates' ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400 font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border-b-2 border-transparent'" class="pb-2.5 text-sm transition-colors flex items-center gap-1.5 whitespace-nowrap">
             <x-heroicon-o-document-duplicate class="w-4 h-4" /> Templates
         </button>
         @endcan

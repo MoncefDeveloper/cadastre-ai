@@ -1,7 +1,7 @@
 <x-filament::modal id="inbound-simulator-modal" width="3xl" slide-over>
     <x-slot name="heading">
         <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center">
+            <div class="w-8 h-8 rounded-lg bg-primary-500/10 text-primary-600 dark:text-primary-400 flex items-center justify-center">
                 <x-heroicon-m-bolt class="w-5 h-5" />
             </div>
             <div>
@@ -17,27 +17,25 @@
         <div class="flex border-b border-gray-200 dark:border-white/10 gap-6">
             <button type="button"
                 @click="simTab = 'presets'"
-                :class="simTab === 'presets' ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400 font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 border-b-2 border-transparent'"
+                :class="simTab === 'presets' ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400 font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border-b-2 border-transparent'"
                 class="pb-2.5 text-sm transition-colors flex items-center gap-2">
                 <x-heroicon-m-sparkles class="w-4 h-4" />
                 1-Click Presets (95%+ Matches)
             </button>
             <button type="button"
                 @click="simTab = 'custom'"
-                :class="simTab === 'custom' ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400 font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 border-b-2 border-transparent'"
+                :class="simTab === 'custom' ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400 font-semibold' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border-b-2 border-transparent'"
                 class="pb-2.5 text-sm transition-colors flex items-center gap-2">
                 <x-heroicon-m-code-bracket class="w-4 h-4" />
                 Custom Webhook Composer
             </button>
         </div>
 
-        <!-- =========================================================================
-             TAB 1: 1-CLICK PRESETS
-             ========================================================================= -->
+        <!-- TAB 1: 1-CLICK PRESETS (Tokenized Carmine Borders) -->
         <div x-show="simTab === 'presets'" class="space-y-4">
 
             <!-- Preset 1: Hydra Diplomatic Estate -->
-            <div class="p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-white/[0.02] hover:border-amber-500/50 transition flex flex-col justify-between gap-3">
+            <div class="p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-white/[0.02] hover:border-primary-500/40 dark:hover:border-primary-500/40 transition flex flex-col justify-between gap-3">
                 <div class="flex items-start justify-between gap-3">
                     <div>
                         <div class="flex items-center gap-2 mb-1">
@@ -51,13 +49,13 @@
                         Simulate
                     </x-filament::button>
                 </div>
-                <p class="text-xs text-gray-600 dark:text-gray-300 italic border-l-2 border-amber-500/40 pl-3">
+                <p class="text-xs text-gray-600 dark:text-gray-300 italic border-l-2 border-primary-500/50 pl-3">
                     "Seeking a 6-bedroom ambassadorial compound in Hydra with high security and heated pool..."
                 </p>
             </div>
 
             <!-- Preset 2: Paris Avenue Montaigne -->
-            <div class="p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-white/[0.02] hover:border-amber-500/50 transition flex flex-col justify-between gap-3">
+            <div class="p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-white/[0.02] hover:border-primary-500/40 dark:hover:border-primary-500/40 transition flex flex-col justify-between gap-3">
                 <div class="flex items-start justify-between gap-3">
                     <div>
                         <div class="flex items-center gap-2 mb-1">
@@ -71,13 +69,13 @@
                         Simulate
                     </x-filament::button>
                 </div>
-                <p class="text-xs text-gray-600 dark:text-gray-300 italic border-l-2 border-amber-500/40 pl-3">
+                <p class="text-xs text-gray-600 dark:text-gray-300 italic border-l-2 border-primary-500/50 pl-3">
                     "Searching for an exclusive 4-bedroom Haussmannian corner penthouse in the Golden Triangle..."
                 </p>
             </div>
 
             <!-- Preset 3: Miami Brickell Penthouse -->
-            <div class="p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-white/[0.02] hover:border-amber-500/50 transition flex flex-col justify-between gap-3">
+            <div class="p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-white/[0.02] hover:border-primary-500/40 dark:hover:border-primary-500/40 transition flex flex-col justify-between gap-3">
                 <div class="flex items-start justify-between gap-3">
                     <div>
                         <div class="flex items-center gap-2 mb-1">
@@ -91,16 +89,14 @@
                         Simulate
                     </x-filament::button>
                 </div>
-                <p class="text-xs text-gray-600 dark:text-gray-300 italic border-l-2 border-amber-500/40 pl-3">
+                <p class="text-xs text-gray-600 dark:text-gray-300 italic border-l-2 border-primary-500/50 pl-3">
                     "Looking for a 3-bedroom luxury sky mansion in Brickell Avenue with Biscayne Bay views..."
                 </p>
             </div>
 
         </div>
 
-        <!-- =========================================================================
-             TAB 2: CUSTOM WEBHOOK COMPOSER
-             ========================================================================= -->
+        <!-- TAB 2: CUSTOM WEBHOOK COMPOSER -->
         <div x-show="simTab === 'custom'" class="space-y-4" style="display: none;">
             {{ $this->simulatorForm }}
         </div>

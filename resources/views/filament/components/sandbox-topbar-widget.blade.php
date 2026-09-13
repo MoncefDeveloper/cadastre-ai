@@ -22,11 +22,8 @@
     x-on:close-modal.window="if ($event.detail.id === 'sandbox-inspector-modal') $wire.set('inspectorOpen', false, false)"
     wire:poll.30s
     class="flex items-center ml-3 shrink-0">
-    <!-- =========================================================================
-         THE 3-PART OUTLINED CAPSULE (AFTER LOGO: TITLE + TIME CHIP + FILAMENT BUTTON)
-         ========================================================================= -->
-    <div class="flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-white/10 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md shadow-xs "
-        style="margin-left: 20px;">
+    <!-- THE 3-PART OUTLINED CAPSULE (Responsive Margin) -->
+    <div class="flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-white/10 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md shadow-xs ml-3 sm:ml-5">
 
         <!-- 1. TITLE (Always Visible) -->
         <span class="text-xs font-bold text-gray-500 dark:text-gray-400 whitespace-nowrap">
@@ -39,7 +36,6 @@
             <span x-text="timeRemaining"></span>
         </div>
 
-        <!-- 3. NATIVE FILAMENT BUTTON WITH BADGE -->
         <!-- 3. NATIVE FILAMENT BUTTON WITH DYNAMIC STATUS COLOR & ICON -->
         <x-filament::button
             type="button"
@@ -59,13 +55,11 @@
 
     </div>
 
-    <!-- =========================================================================
-         SLIDE-OVER SANDBOX INSPECTOR MODAL
-         ========================================================================= -->
+    <!-- SLIDE-OVER SANDBOX INSPECTOR MODAL -->
     <x-filament::modal id="sandbox-inspector-modal" width="3xl" slide-over>
         <x-slot name="heading">
             <div class="flex items-center gap-2.5">
-                <div class="w-12 h-12 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center">
+                <div class="w-12 h-12 rounded-lg bg-primary-500/10 text-primary-600 dark:text-primary-400 flex items-center justify-center">
                     <x-heroicon-m-cpu-chip class="w-7 h-7" />
                 </div>
                 <div>
@@ -77,8 +71,8 @@
 
         <div class="space-y-5 pr-1 pb-4 text-gray-800 dark:text-gray-200">
             @if($this->inspectorOpen)
-            <!-- SECTION A: Countdown Banner -->
-            <x-filament::callout color="info" icon="heroicon-o-clock">
+            <!-- SECTION A: Countdown Banner (Aligned to Primary Carmine) -->
+            <x-filament::callout color="primary" icon="heroicon-o-clock">
                 <x-slot name="heading">
                     <span class="font-bold text-md">Next Automatic Self-Healing Cycle</span>
                 </x-slot>
@@ -90,7 +84,6 @@
                 </x-slot>
             </x-filament::callout>
 
-            <!-- SECTION B: High-Level Metric Stat Cards -->
             <!-- SECTION B: High-Level Metric Stat Cards (4 Cards) -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 <div class="p-3 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-white/[0.02] flex flex-col items-center text-center">
@@ -118,8 +111,7 @@
                 </div>
             </div>
 
-            <!-- SECTION C: Model-by-Model Interactive Tree -->
-            <!-- SECTION C: Model-by-Model Interactive Tree -->
+            <!-- SECTION C: Model-by-Model Interactive Tree (Includes AI Modifiers) -->
             <div class="space-y-3">
                 <h4 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Model-by-Model Breakdown</h4>
 
@@ -130,16 +122,13 @@
                             <div class="flex items-center gap-3">
                                 <x-filament::icon :icon="$info['icon']" class="w-6 h-6 text-gray-400" />
                                 <span class="text-sm font-bold text-gray-900 dark:text-white">{{ $label }}</span>
-
-                                <!-- 🏷️ Simple Human-Friendly Label -->
                                 <span class="text-[11px] text-gray-400 font-medium">({{ $info['limit'] }} Protected Base)</span>
 
-                                <!-- 🔗 Global Link to Resource Index -->
                                 @if(!empty($info['index_url']))
                                 <a href="{{ $info['index_url'] }}"
                                     target="_blank"
                                     @click.stop
-                                    class="text-gray-400 hover:text-amber-500 transition-colors p-0.5"
+                                    class="text-gray-400 hover:text-primary-500 transition-colors p-0.5"
                                     title="Open {{ $label }} Table in new tab">
                                     <x-filament::icon icon="heroicon-m-arrow-top-right-on-square" class="w-3.5 h-3.5" />
                                 </a>
@@ -148,7 +137,6 @@
                             <div class="flex items-center gap-1.5">
                                 <x-filament::badge color="success" size="md">{{ $info['baseline_count'] }} Base</x-filament::badge>
 
-                                {{-- 🟠 Show Updated Baseline Badge --}}
                                 @if(!empty($info['modified_count']) && $info['modified_count'] > 0)
                                 <x-filament::badge color="warning" size="md">{{ $info['modified_count'] }} Updated</x-filament::badge>
                                 @endif
@@ -169,11 +157,10 @@
                             <div class="flex items-center gap-2 min-w-0 pr-2">
                                 <span class="font-mono text-gray-400 text-[11px]">#{{ $rec['id'] }}</span>
 
-                                <!-- 🔗 Clickable Record Link -->
                                 @if(!empty($rec['url']))
                                 <a href="{{ $rec['url'] }}"
                                     target="_blank"
-                                    class="font-medium text-gray-800 dark:text-gray-200 hover:text-amber-500 dark:hover:text-amber-400 hover:underline truncate transition-colors">
+                                    class="font-medium text-gray-800 dark:text-gray-200 hover:text-primary-500 dark:hover:text-primary-400 hover:underline truncate transition-colors">
                                     {{ $rec['identifier'] }}
                                 </a>
                                 @else
@@ -181,10 +168,8 @@
                                 @endif
                             </div>
                             <div class="flex items-center gap-1.5 shrink-0">
-                                {{-- 🕒 Show age for VISITOR records (created_at age) --}}
                                 @if($rec['status'] !== 'baseline')
                                 <span class="text-[11px] text-gray-400 font-mono">{{ $rec['age_minutes'] }}m ago</span>
-                                {{-- 🕒 Show age for UPDATED BASELINE records (updated_at age) --}}
                                 @elseif(!empty($rec['is_modified']))
                                 <span class="text-[11px] text-gray-400 font-mono">{{ $rec['updated_age_minutes'] }}m ago</span>
                                 @endif

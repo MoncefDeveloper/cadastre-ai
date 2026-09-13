@@ -88,9 +88,10 @@ trait ManagesChatDraft
                 ->body('Direct outbound email dispatch is restricted on baseline demo threads.')
                 ->actions([
                     Action::make('simulate')
-                        ->label('⚡ Simulate Inbound Lead')
+                        ->label('Simulate Inbound Lead')
                         ->button()
                         ->color('warning')
+                        ->outlined()
                         ->dispatch('open-modal', ['id' => 'inbound-simulator-modal'])
                         ->close(),
                 ])
