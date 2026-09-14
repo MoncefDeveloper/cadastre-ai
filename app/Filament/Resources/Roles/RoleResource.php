@@ -54,11 +54,6 @@ class RoleResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    /*
-     |----------------------------------------------------------------------
-     | Navigation Invariants (Explicit overrides for Shield's HasNavigation trait)
-     |----------------------------------------------------------------------
-     */
     public static function getNavigationGroup(): ?string
     {
         return 'Administration';
@@ -101,11 +96,6 @@ class RoleResource extends Resource
         return 'Configured Shield security roles and permission gates';
     }
 
-    /*
-     |----------------------------------------------------------------------
-     | Global Search Configuration (Shield Role & Matrix Lookup)
-     |----------------------------------------------------------------------
-     */
     public static function getGloballySearchableAttributes(): array
     {
         return ['name', 'guard_name'];
@@ -133,7 +123,7 @@ class RoleResource extends Resource
                                     ->unique(
                                         ignoreRecord: true,
                                         /** @phpstan-ignore-next-line */
-                                        modifyRuleUsing: fn(Unique $rule): Unique => Utils::isTenancyEnabled() ? $rule->where(Utils::getTenantModelForeignKey(), Filament::getTenant()?->id) : $rule
+                                        modifyRuleUsing: fn (Unique $rule): Unique => Utils::isTenancyEnabled() ? $rule->where(Utils::getTenantModelForeignKey(), Filament::getTenant()?->id) : $rule
                                     )
                                     ->required()
                                     ->maxLength(255),
@@ -149,9 +139,9 @@ class RoleResource extends Resource
                                     ->placeholder(__('filament-shield::filament-shield.field.team.placeholder'))
                                     /** @phpstan-ignore-next-line */
                                     ->default(Filament::getTenant()?->id)
-                                    ->options(fn(): array => in_array(Utils::getTenantModel(), [null, '', '0'], true) ? [] : Utils::getTenantModel()::pluck('name', 'id')->toArray())
-                                    ->visible(fn(): bool => static::shield()->isCentralApp() && Utils::isTenancyEnabled())
-                                    ->dehydrated(fn(): bool => static::shield()->isCentralApp() && Utils::isTenancyEnabled()),
+                                    ->options(fn (): array => in_array(Utils::getTenantModel(), [null, '', '0'], true) ? [] : Utils::getTenantModel()::pluck('name', 'id')->toArray())
+                                    ->visible(fn (): bool => static::shield()->isCentralApp() && Utils::isTenancyEnabled())
+                                    ->dehydrated(fn (): bool => static::shield()->isCentralApp() && Utils::isTenancyEnabled()),
                                 static::getSelectAllFormComponent(),
 
                             ])
@@ -170,39 +160,93 @@ class RoleResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
+            ->emptyStateHeading('No roles defined')
+            ->emptyStateDescription('Configure Spatie Shield security roles and permission gates.')
+            ->emptyStateIcon('heroicon-o-shield-check')
             ->columns([
+                // 1. Role Title (Max 30 Chars + Headline Capitalization + Tooltip)
                 TextColumn::make('name')
-                    ->weight(FontWeight::Medium)
                     ->label(__('filament-shield::filament-shield.column.name'))
-                    ->formatStateUsing(fn(string $state): string => Str::headline($state))
-                    ->searchable(),
+                    ->weight(FontWeight::Bold)
+                    ->searchable()
+                    ->sortable()
+                    ->limit(30)
+                    ->formatStateUsing(fn (string $state): string => Str::headline($state))
+                    ->tooltip(fn (Model $record): string => Str::headline($record->name)),
+
+                // 2. Guard Name (Centered Badge)
                 TextColumn::make('guard_name')
+                    ->label(__('filament-shield::filament-shield.column.guard_name'))
                     ->badge()
                     ->color('warning')
-                    ->label(__('filament-shield::filament-shield.column.guard_name')),
+                    ->alignCenter()
+                    ->toggleable(),
+
+                // 3. Team / Scope (Centered Badge)
                 TextColumn::make('team.name')
+                    ->label(__('filament-shield::filament-shield.column.team'))
                     ->default('Global')
                     ->badge()
-                    ->color(fn(mixed $state): string => str($state)->contains('Global') ? 'gray' : 'primary')
-                    ->label(__('filament-shield::filament-shield.column.team'))
+                    ->alignCenter()
+                    ->color(fn (mixed $state): string => str((string) $state)->contains('Global') ? 'gray' : 'primary')
                     ->searchable()
-                    ->visible(fn(): bool => static::shield()->isCentralApp() && Utils::isTenancyEnabled()),
+                    ->visible(fn (): bool => static::shield()->isCentralApp() && Utils::isTenancyEnabled())
+                    ->toggleable(),
+
+                // 4. Granted Permissions Count (Centered Primary Badge)
                 TextColumn::make('permissions_count')
-                    ->badge()
                     ->label(__('filament-shield::filament-shield.column.permissions'))
                     ->counts('permissions')
-                    ->color('primary'),
+                    ->badge()
+                    ->color('primary')
+                    ->alignCenter()
+                    ->formatStateUsing(fn (int $state): string => "{$state} Granted")
+                    ->toggleable(),
+
+                // 5. Updated At (Centered Gray Badge with Datetime Tooltip)
                 TextColumn::make('updated_at')
                     ->label(__('filament-shield::filament-shield.column.updated_at'))
-                    ->dateTime(),
+                    ->badge()
+                    ->color('gray')
+                    ->dateTime('M d, Y')
+                    ->sortable()
+                    ->alignCenter()
+                    ->tooltip(fn (Model $record): ?string => $record->updated_at?->format('M d, Y - h:i A'))
+                    ->toggleable(),
+
+                // 6. Created At (Centered Gray Badge with Datetime Tooltip, Hidden by Default)
+                TextColumn::make('created_at')
+                    ->label('Created')
+                    ->badge()
+                    ->color('gray')
+                    ->dateTime('M d, Y')
+                    ->sortable()
+                    ->alignCenter()
+                    ->tooltip(fn (Model $record): ?string => $record->created_at?->format('M d, Y - h:i A'))
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
             ->recordActions([
+                // Edit Action: Outlined info button
                 EditAction::make()
-                    ->color('gray'),
-                DeleteAction::make(),
+                    ->color('info')
+                    ->button()
+                    ->outlined()
+                    ->size('sm')
+                    ->iconSize('sm'),
+
+                // Delete Action: Outlined primary button strictly hidden on super_admin
+                DeleteAction::make()
+                    ->color('primary')
+                    ->icon('heroicon-o-trash')
+                    ->button()
+                    ->outlined()
+                    ->size('sm')
+                    ->iconSize('sm')
+                    ->hidden(fn (Model $record): bool => in_array($record->name, ['super_admin', 'super-admin', 'Super Admin'], true)),
             ])
             ->toolbarActions([
                 DeleteBulkAction::make(),
@@ -250,13 +294,11 @@ class RoleResource extends Resource
 
     public static function getShieldFormComponents(): \Filament\Schemas\Components\Component
     {
-        // 1. Build the baseline tabs array using Shield's native trait builders
         $tabs = [
             static::getTabFormComponentForResources(),
             static::getTabFormComponentForPage(),
         ];
 
-        // 2. Append the custom tab styled EXACTLY like the standard resource cards
         $tabs[] = \Filament\Schemas\Components\Tabs\Tab::make('Custom Permissions')
             ->badge(count(config('filament-shield.custom_permissions', [])))
             ->schema([
@@ -482,7 +524,6 @@ class RoleResource extends Resource
                     ]),
             ])->columns(2);
 
-        // 3. Instantiate and return the unified containerized Tabs component
         return \Filament\Schemas\Components\Tabs::make('Permissions')
             ->contained()
             ->tabs($tabs)

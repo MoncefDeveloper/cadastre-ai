@@ -8,6 +8,7 @@ use App\Filament\Resources\Roles\RoleResource;
 use BezhanSalleh\FilamentShield\Support\Utils;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Override;
@@ -21,7 +22,10 @@ class EditRole extends EditRecord
     protected function getActions(): array
     {
         return [
-            DeleteAction::make(),
+            DeleteAction::make()
+                ->icon('heroicon-o-trash')
+                ->outlined()
+                ->hidden(fn (Model $record): bool => in_array($record->name, ['super_admin', 'super-admin', 'Super Admin'], true)),
         ];
     }
 

@@ -15,7 +15,13 @@ class ViewRole extends ViewRecord
     protected function getActions(): array
     {
         return [
-            EditAction::make(),
+            EditAction::make()
+                ->icon('heroicon-o-pencil-square')
+                ->color('info')
+                ->button()
+                ->outlined()
+                ->size('sm')
+                ->iconSize('sm'),
         ];
     }
 }
