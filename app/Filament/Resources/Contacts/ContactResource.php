@@ -24,6 +24,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\HtmlString;
 use UnitEnum;
 
 class ContactResource extends Resource
@@ -94,9 +95,15 @@ class ContactResource extends Resource
         return $schema
             ->components([
                 Select::make('status')
+                    ->label('Inquiry Status')
                     ->options(ContactMessageStatus::class)
-                    ->required(),
-            ])->columns(1);
+                    ->required()
+                    ->native(false)
+                    ->validationMessages([
+                        'required' => 'Please select an inquiry status.',
+                    ]),
+            ])
+            ->columns(1);
     }
 
     public static function infolist(Schema $schema): Schema
@@ -104,29 +111,38 @@ class ContactResource extends Resource
         return $schema
             ->components([
                 Section::make('Sender Details')
+                    ->description('Contact identity, reachability and security IP metadata.')
                     ->columns(2)
                     ->schema([
                         TextEntry::make('name')
+                            ->label('Sender Name')
                             ->weight(FontWeight::Bold),
 
                         TextEntry::make('email')
+                            ->label('Email Address')
                             ->copyable()
                             ->icon(Heroicon::Envelope),
 
                         TextEntry::make('phone')
+                            ->label('Phone Number')
                             ->copyable()
-                            ->icon(Heroicon::Phone),
+                            ->icon(Heroicon::Phone)
+                            ->placeholder('—'),
 
                         TextEntry::make('ip_address')
-                            ->label('IP Address'),
+                            ->label('Origin IP Address')
+                            ->placeholder('N/A'),
                     ]),
 
-                Section::make('Message')
+                Section::make('Message Body')
+                    ->description('Full raw inquiry transmitted via web portal.')
                     ->schema([
                         TextEntry::make('subject')
+                            ->label('Subject')
                             ->weight(FontWeight::Bold),
 
                         TextEntry::make('message')
+                            ->label('Message Content')
                             ->markdown(),
                     ]),
             ]);
@@ -135,42 +151,98 @@ class ContactResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->checkIfRecordIsSelectableUsing(fn(Model $record): bool => ! method_exists($record, 'isBaselineRecord') || ! $record->isBaselineRecord() || auth()->id() === 1)
+            ->checkIfRecordIsSelectableUsing(fn (Model $record): bool => ! method_exists($record, 'isBaselineRecord') || ! $record->isBaselineRecord() || auth()->id() === 1)
             ->poll('15s')
             ->defaultSort('created_at', 'desc')
+            ->emptyStateHeading('No inquiries found')
+            ->emptyStateDescription('Inbound webform inquiries will appear here in real-time.')
+            ->emptyStateIcon('heroicon-o-chat-bubble-bottom-center-text')
             ->columns([
+                // 1. Sender Name (Max 30 Chars + Hover Tooltip + Stacked Subject)
                 TextColumn::make('name')
+                    ->label('Sender')
                     ->searchable()
-                    ->description(fn(Contact $record): ?string => $record->subject)
-                    ->weight(fn(Contact $record): string => $record->status === ContactMessageStatus::Unread ? 'bold' : 'normal'),
+                    ->sortable()
+                    ->limit(30)
+                    ->tooltip(fn (Contact $record): ?string => $record->name)
+                    ->description(function (Contact $record): ?HtmlString {
+                        if (blank($record->subject)) {
+                            return null;
+                        }
 
+                        $subject = (string) $record->subject;
+                        $truncated = str($subject)->limit(30)->toString();
+
+                        return new HtmlString('<span title="' . e($subject) . '" class="cursor-help text-xs text-gray-500 dark:text-gray-400">' . e($truncated) . '</span>');
+                    })
+                    ->weight(fn (Contact $record): string => $record->status === ContactMessageStatus::Unread ? 'bold' : 'normal'),
+
+                // 2. Email Address (Copyable + Tooltip + Toggleable)
                 TextColumn::make('email')
+                    ->label('Email Address')
                     ->searchable()
                     ->copyable()
-                    ->icon('heroicon-m-envelope'),
+                    ->limit(30)
+                    ->tooltip(fn (Contact $record): ?string => $record->email)
+                    ->icon('heroicon-m-envelope')
+                    ->toggleable(),
 
+                // 3. Phone (Centered & Toggleable)
+                TextColumn::make('phone')
+                    ->label('Phone Number')
+                    ->searchable()
+                    ->alignCenter()
+                    ->placeholder('—')
+                    ->toggleable(),
+
+                // 4. Status Dropdown Column (Centered with Spacing Gutter)
                 SelectColumn::make('status')
+                    ->label('Status')
                     ->options(ContactMessageStatus::class)
                     ->sortable()
                     ->searchable()
-                    ->disabled(fn(): bool => ! auth()->user()->can('Update:Contact')),
+                    ->alignCenter()
+                    ->extraHeaderAttributes(['class' => 'px-6'])
+                    ->extraCellAttributes(['class' => 'px-6'])
+                    ->disabled(fn (): bool => ! auth()->user()->can('Update:Contact'))
+                    ->toggleable(),
 
+                // 5. Received Timestamp (Centered Gray Badge with Exact Datetime Tooltip)
                 TextColumn::make('created_at')
                     ->label('Received')
-                    ->dateTime()
+                    ->badge()
+                    ->color('gray')
+                    ->dateTime('M d, Y')
                     ->sortable()
+                    ->alignCenter()
+                    ->tooltip(fn (Contact $record): ?string => $record->created_at?->format('M d, Y - h:i A'))
                     ->toggleable(),
             ])
             ->filters([
                 SelectFilter::make('status')
                     ->options(ContactMessageStatus::class)
+                    ->label('Inquiry Status')
                     ->default(ContactMessageStatus::Unread->value),
             ])
             ->recordActions([
+                // View Action: Outlined info button triggering the Slide-Over Dossier
                 ViewAction::make()
                     ->slideOver()
-                    ->color('gray'),
-                DeleteAction::make(),
+                    ->color('info')
+                    ->icon('heroicon-o-eye')
+                    ->button()
+                    ->outlined()
+                    ->size('sm')
+                    ->iconSize('sm'),
+
+                // Delete Action: Outlined primary button as requested to prevent color clash
+                DeleteAction::make()
+                    ->color('primary')
+                    ->icon('heroicon-o-trash')
+                    ->button()
+                    ->outlined()
+                    ->size('sm')
+                    ->iconSize('sm'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
