@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Templates\Pages;
 
 use App\Filament\Resources\Templates\TemplateResource;
@@ -13,7 +15,9 @@ class EditTemplate extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            DeleteAction::make(),
+            DeleteAction::make()
+                ->icon('heroicon-o-trash')
+                ->outlined(),
         ];
     }
 }

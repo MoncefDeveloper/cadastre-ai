@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Templates\Pages;
 
 use App\Filament\Resources\Templates\TemplateResource;
@@ -13,7 +15,8 @@ class ListTemplates extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()
+                ->icon('heroicon-o-plus-circle'),
         ];
     }
 }
