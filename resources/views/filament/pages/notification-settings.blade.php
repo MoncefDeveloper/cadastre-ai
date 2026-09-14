@@ -3,14 +3,14 @@
 
         {{ $this->form }}
 
-        <!-- Clean, flat, perfectly styled save button with native loading state -->
         <div class="flex justify-end pt-4">
             <x-filament::button
                 type="submit"
                 size="md"
                 color="primary"
-                outlined="true"
-                icon="heroicon-m-bookmark"
+                outlined
+                icon="heroicon-o-bookmark"
+                wire:loading.attr="disabled"
                 wire:target="save"
             >
                 Save Preferences

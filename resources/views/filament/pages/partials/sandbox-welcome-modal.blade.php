@@ -24,7 +24,7 @@
         <div class="space-y-4 pr-1 pb-2">
 
             <!-- 1. Top Callout: Sandbox Status (Aligned to Primary Carmine) -->
-            <x-filament::callout color="primary" icon="heroicon-o-shield-check">
+            <x-filament::callout color="success" icon="heroicon-o-shield-check">
                 <x-slot name="heading">
                     <span class="font-bold text-xs">Live Sandbox Playground Active</span>
                 </x-slot>
