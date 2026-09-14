@@ -23,7 +23,7 @@ class CreateUser extends CreateRecord
     {
         return [
             Action::make('quickFill')
-                ->label('⚡ Quick Fill')
+                ->label('Quick Fill') // Removed lightning emoji
                 ->icon('heroicon-m-sparkles')
                 ->outlined()
                 ->color('warning')
