@@ -85,9 +85,10 @@ class FaqResource extends Resource
         return $schema
             ->components([
                 Section::make('Question Details')
+                    ->description('Knowledge base inquiry, target readership segment, and visibility.')
                     ->headerActions([
                         Action::make('quickFill')
-                            ->label('⚡ Quick Fill')
+                            ->label('Quick Fill') // Removed lightning emoji
                             ->icon('heroicon-m-sparkles')
                             ->outlined()
                             ->color('warning')
@@ -103,27 +104,41 @@ class FaqResource extends Resource
                     ->columns(2)
                     ->components([
                         TextInput::make('question')
+                            ->label('Question')
+                            ->prefixIcon('heroicon-m-question-mark-circle')
                             ->columnSpanFull()
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->placeholder('e.g., How does the AI match inquiries to properties?')
+                            ->validationMessages([
+                                'required' => 'Please enter the question text.',
+                                'max' => 'The question cannot exceed 255 characters.',
+                            ]),
 
                         Select::make('target_audience')
+                            ->label('Target Audience')
                             ->options([
-                                'global' => 'Global (Public)',
-                                'agents' => 'Agents Only',
+                                'global'  => 'Global (Public)',
+                                'agents'  => 'Agents Only',
                                 'clients' => 'Clients Only',
                                 'billing' => 'Billing / Subscriptions',
                             ])
                             ->default('global')
-                            ->required(),
+                            ->required()
+                            ->native(false)
+                            ->validationMessages([
+                                'required' => 'Please select the target audience segment.',
+                            ]),
 
                         Toggle::make('is_active')
-                            ->label('Visible')
+                            ->label('Visible in Knowledge Base')
                             ->default(true)
-                            ->inline(false),
+                            ->inline(false)
+                            ->disabled(fn (?Faq $record): bool => $record !== null && ! auth()->user()->can('Update:Faq')),
                     ]),
 
-                Section::make('Answer')
+                Section::make('Answer Content')
+                    ->description('Detailed explanatory response supporting rich text formatting.')
                     ->components([
                         RichEditor::make('answer')
                             ->hiddenLabel()
@@ -139,7 +154,10 @@ class FaqResource extends Resource
                                 'strike',
                                 'undo',
                             ])
-                            ->columnSpanFull(),
+                            ->columnSpanFull()
+                            ->validationMessages([
+                                'required' => 'Please provide the answer content.',
+                            ]),
                     ]),
             ])->columns(1);
     }
@@ -147,45 +165,86 @@ class FaqResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->checkIfRecordIsSelectableUsing(fn(Model $record): bool => ! method_exists($record, 'isBaselineRecord') || ! $record->isBaselineRecord() || auth()->id() === 1)
+            ->checkIfRecordIsSelectableUsing(fn (Model $record): bool => ! method_exists($record, 'isBaselineRecord') || ! $record->isBaselineRecord() || auth()->id() === 1)
             ->recordTitleAttribute('question')
             ->reorderable('sort_order')
-            ->defaultSort('sort_order')
+            ->defaultSort('sort_order', 'asc')
+            ->emptyStateHeading('No FAQs found')
+            ->emptyStateDescription('Create knowledge base entries and onboarding answers.')
+            ->emptyStateIcon('heroicon-o-question-mark-circle')
             ->columns([
+                // 1. Question (Max 30 Chars + Hover Tooltip)
                 TextColumn::make('question')
+                    ->label('Question')
                     ->searchable()
-                    ->limit(50)
+                    ->limit(30)
+                    ->tooltip(fn (Faq $record): ?string => $record->question)
                     ->weight('bold'),
 
+                // 2. Target Audience Badge (Centered + Toggleable)
                 TextColumn::make('target_audience')
+                    ->label('Audience')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'global' => 'success',
-                        'agents' => 'warning',
+                    ->alignCenter()
+                    ->color(fn (string $state): string => match ($state) {
+                        'global'  => 'success',
+                        'agents'  => 'warning',
                         'clients' => 'info',
                         'billing' => 'danger',
-                        default => 'gray',
-                    }),
+                        default   => 'gray',
+                    })
+                    ->toggleable(),
 
-                ToggleColumn::make('is_active')->label('Active')->sortable()->alignCenter()
-                    ->disabled(fn(Faq $record): bool => ! auth()->user()->can('Update:Faq') || $record->id === auth()->id()),
+                // 3. Active Status Toggle (Centered + Toggleable)
+                ToggleColumn::make('is_active')
+                    ->label('Active')
+                    ->sortable()
+                    ->alignCenter()
+                    ->disabled(fn (Faq $record): bool => ! auth()->user()->can('Update:Faq'))
+                    ->toggleable(),
+
+                // 4. Creation Timestamp (Centered Gray Badge with Exact Datetime Tooltip)
+                TextColumn::make('created_at')
+                    ->label('Created')
+                    ->badge()
+                    ->color('gray')
+                    ->dateTime('M d, Y')
+                    ->sortable()
+                    ->alignCenter()
+                    ->tooltip(fn (Faq $record): ?string => $record->created_at?->format('M d, Y - h:i A'))
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 TernaryFilter::make('is_active')
-                    ->label('Status'),
+                    ->label('Active Status'),
+
                 SelectFilter::make('target_audience')
                     ->options([
-                        'global' => 'Global',
-                        'agents' => 'Agents',
+                        'global'  => 'Global',
+                        'agents'  => 'Agents',
                         'clients' => 'Clients',
                         'billing' => 'Billing',
-                    ]),
+                    ])
+                    ->label('Audience Segment'),
             ])
             ->recordActions([
+                // Edit Action: Outlined info button with slide-over
                 EditAction::make()
                     ->slideOver()
-                    ->color('gray'),
-                DeleteAction::make(),
+                    ->color('info')
+                    ->button()
+                    ->outlined()
+                    ->size('sm')
+                    ->iconSize('sm'),
+
+                // Delete Action: Outlined primary button with trash icon
+                DeleteAction::make()
+                    ->color('primary')
+                    ->icon('heroicon-o-trash')
+                    ->button()
+                    ->outlined()
+                    ->size('sm')
+                    ->iconSize('sm'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

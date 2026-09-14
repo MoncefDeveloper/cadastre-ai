@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Faqs\Pages;
 
 use App\Filament\Resources\Faqs\FaqResource;
@@ -13,7 +15,9 @@ class ManageFaqs extends ManageRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->slideOver(),
+            CreateAction::make()
+                ->icon('heroicon-o-plus-circle')
+                ->slideOver(),
         ];
     }
 }
