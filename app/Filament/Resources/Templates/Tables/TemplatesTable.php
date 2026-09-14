@@ -97,6 +97,7 @@ class TemplatesTable
                     ->outlined()
                     ->size('sm')
                     ->iconSize('sm')
+                    ->modalWidth('md')
                     ->visible(fn (): bool => auth()->user()->can('replicate_ai_templates'))
                     ->beforeReplicaSaved(function (Model $replica): void {
                         $replica->name = $replica->name . ' (Copy)';

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Plans\Pages;
 
 use App\Filament\Resources\Plans\PlanResource;
@@ -14,6 +16,7 @@ class ManagePlans extends ManageRecords
     {
         return [
             CreateAction::make()
+                ->icon('heroicon-o-plus-circle')
                 ->slideOver(),
         ];
     }

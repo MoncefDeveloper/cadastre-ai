@@ -88,8 +88,9 @@ class PlanResource extends Resource
     {
         return $schema
             ->components([
-                // Stacked Section 1
+                // SECTION 1: Core Financial Identity
                 Section::make('Core Details')
+                    ->description('Package identification, URL key, and monthly/yearly pricing tiers.')
                     ->headerActions([
                         Action::make('quickFill')
                             ->label('Quick Fill')
@@ -102,7 +103,7 @@ class PlanResource extends Resource
 
                                 $set('name', $name);
                                 $set('slug', Str::slug($name));
-                                $set('description', "Designed for expanding real estate brokerages requiring multi-seat AI shared inbox triage and advanced FHA compliance auditing.");
+                                $set('description', 'Designed for expanding real estate brokerages requiring multi-seat AI shared inbox triage and advanced FHA compliance auditing.');
                                 $set('price_monthly', '249');
                                 $set('price_yearly', '2490');
                                 $set('currency', 'USD');
@@ -126,41 +127,72 @@ class PlanResource extends Resource
                     ->columns(2)
                     ->components([
                         TextInput::make('name')
+                            ->label('Plan Name')
+                            ->prefixIcon('heroicon-m-credit-card')
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
                             ->afterStateUpdated(
-                                fn(string $operation, $state, callable $set) =>
+                                fn (string $operation, $state, callable $set) =>
                                 $operation === 'create' ? $set('slug', Str::slug($state)) : null
-                            ),
+                            )
+                            ->validationMessages([
+                                'required' => 'Please enter a name for this subscription plan.',
+                                'max' => 'The plan name cannot exceed 255 characters.',
+                            ]),
+
                         TextInput::make('slug')
+                            ->label('Plan Slug Key')
                             ->required()
+                            ->maxLength(255)
                             ->unique(ignoreRecord: true)
                             ->readOnly()
-                            ->dehydrated(),
+                            ->dehydrated()
+                            ->validationMessages([
+                                'required' => 'A unique plan slug identifier is required.',
+                                'unique' => 'This plan slug key is already assigned to another package.',
+                            ]),
 
                         Textarea::make('description')
+                            ->label('Package Narrative')
                             ->columnSpanFull()
-                            ->rows(7)
-                            ->nullable(),
+                            ->rows(4)
+                            ->nullable()
+                            ->maxLength(1000)
+                            ->validationMessages([
+                                'max' => 'Plan description cannot exceed 1,000 characters.',
+                            ]),
 
                         TextInput::make('price_monthly')
                             ->label('Monthly Price')
                             ->numeric()
                             ->inputMode('decimal')
+                            ->minValue(0)
                             ->required()
-                            ->formatStateUsing(fn(?int $state): ?string => $state !== null ? (string) round($state / 100, 2) : null)
-                            ->dehydrateStateUsing(fn(?string $state): int => $state ? (int) round(((float) $state) * 100) : 0),
+                            ->formatStateUsing(fn (?int $state): ?string => $state !== null ? (string) round($state / 100, 2) : null)
+                            ->dehydrateStateUsing(fn (?string $state): int => $state ? (int) round(((float) $state) * 100) : 0)
+                            ->validationMessages([
+                                'required' => 'Monthly subscription price is required.',
+                                'numeric' => 'Price must be a valid numerical value.',
+                                'min' => 'Price cannot be negative.',
+                            ]),
 
                         TextInput::make('price_yearly')
-                            ->label('Yearly Price')
+                            ->label('Yearly Price (Discounted)')
                             ->numeric()
                             ->inputMode('decimal')
+                            ->minValue(0)
                             ->required()
-                            ->formatStateUsing(fn(?int $state): ?string => $state !== null ? (string) round($state / 100, 2) : null)
-                            ->dehydrateStateUsing(fn(?string $state): int => $state ? (int) round(((float) $state) * 100) : 0),
+                            ->formatStateUsing(fn (?int $state): ?string => $state !== null ? (string) round($state / 100, 2) : null)
+                            ->dehydrateStateUsing(fn (?string $state): int => $state ? (int) round(((float) $state) * 100) : 0)
+                            ->validationMessages([
+                                'required' => 'Yearly subscription price is required.',
+                                'numeric' => 'Price must be a valid numerical value.',
+                                'min' => 'Price cannot be negative.',
+                            ]),
 
                         Select::make('currency')
+                            ->label('Billing Currency')
                             ->columnSpanFull()
                             ->options([
                                 'SAR' => 'SAR (Saudi Riyal)',
@@ -168,43 +200,56 @@ class PlanResource extends Resource
                                 'EUR' => 'EUR (Euro)',
                             ])
                             ->default('USD')
-                            ->required(),
+                            ->required()
+                            ->native(false)
+                            ->validationMessages([
+                                'required' => 'Please designate a billing currency.',
+                            ]),
                     ]),
 
-                // Stacked Section 2
+                // SECTION 2: Marketing Highlights, Caps & Visibility
                 Section::make('Marketing & Configuration')
+                    ->description('Feature bullets, operational system caps, and homepage highlight card.')
                     ->columns(2)
                     ->components([
                         TagsInput::make('features')
                             ->columnSpanFull()
                             ->label('Feature Highlights')
                             ->placeholder('e.g., 5 Agent Seats')
-                            ->helperText('Press Enter to add a feature. (Stored as a flat JSON array)'),
+                            ->helperText('Press Enter to add a marketing bullet point. (Stored as flat JSON array)'),
 
                         KeyValue::make('limits')
                             ->columnSpanFull()
-                            ->label('System Limits')
+                            ->label('System Operational Limits')
                             ->keyLabel('Metric Code')
                             ->valueLabel('Limit Value')
-                            ->addActionLabel('Add Limit')
-                            ->helperText('e.g., Key: "agents", Value: "5"'),
+                            ->addActionLabel('Add Metric Cap')
+                            ->helperText('Define operational limits (e.g. Key: "agents", Value: "5").'),
 
                         TextInput::make('mock_subscriber_count')
                             ->columnSpanFull()
-                            ->label('Subscribers (Mock)')
+                            ->label('Active Subscriber Count (Telemetry)')
                             ->numeric()
+                            ->minValue(0)
                             ->default(0)
-                            ->required(),
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Subscriber count must be defined.',
+                                'numeric' => 'Subscriber count must be a number.',
+                                'min' => 'Subscriber count cannot be negative.',
+                            ]),
 
                         Toggle::make('is_active')
                             ->label('Active Plan')
                             ->default(true)
-                            ->disabled(fn(): bool => ! auth()->user()->can('toggle_plan_status')),
+                            ->disabled(fn (): bool => ! auth()->user()->can('toggle_plan_status')),
 
+                        // Featured toggle input with Info color
                         Toggle::make('is_featured')
                             ->label('Featured (Highlight Card)')
+                            ->onColor('info')
                             ->default(false)
-                            ->disabled(fn(): bool => ! auth()->user()->can('feature_saas_plans')),
+                            ->disabled(fn (): bool => ! auth()->user()->can('feature_saas_plans')),
                     ]),
             ])->columns(1);
     }
@@ -212,55 +257,111 @@ class PlanResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->checkIfRecordIsSelectableUsing(fn(Model $record): bool => ! method_exists($record, 'isBaselineRecord') || ! $record->isBaselineRecord() || auth()->id() === 1)
+            ->checkIfRecordIsSelectableUsing(fn (Model $record): bool => ! method_exists($record, 'isBaselineRecord') || ! $record->isBaselineRecord() || auth()->id() === 1)
             ->recordTitleAttribute('name')
             ->reorderable('sort_order')
-            ->defaultSort('sort_order')
+            ->defaultSort('sort_order', 'asc')
+            ->emptyStateHeading('No subscription plans found')
+            ->emptyStateDescription('Create pricing packages to monetize your real estate CRM.')
+            ->emptyStateIcon('heroicon-o-credit-card')
             ->columns([
+                // 1. Plan Name (Max 30 Chars + Hover Tooltip)
                 TextColumn::make('name')
-                    ->label('Plan')
+                    ->label('Plan Name')
                     ->searchable()
                     ->sortable()
-                    ->description(fn(Plan $record): string => $record->slug)
+                    ->limit(30)
+                    ->tooltip(fn (Plan $record): ?string => $record->name)
                     ->weight('bold'),
 
+                // 2. Slug Key (Centered Gray Badge)
+                TextColumn::make('slug')
+                    ->label('Slug Key')
+                    ->badge()
+                    ->color('gray')
+                    ->alignCenter()
+                    ->sortable()
+                    ->toggleable(),
+
+                // 3. Monthly Price (Centered + Tooltip)
                 TextColumn::make('price_monthly')
                     ->label('Monthly')
-                    ->formatStateUsing(fn(int $state, Plan $record): string => Number::currency($state / 100, in: $record->currency))
-                    ->sortable(),
+                    ->formatStateUsing(fn (int $state, Plan $record): string => Number::currency($state / 100, in: $record->currency))
+                    ->sortable()
+                    ->alignCenter()
+                    ->tooltip(fn (Plan $record): string => Number::currency($record->price_monthly / 100, in: $record->currency)),
 
+                // 4. Yearly Price (Centered + Tooltip + Toggleable)
                 TextColumn::make('price_yearly')
                     ->label('Yearly')
-                    ->formatStateUsing(fn(int $state, Plan $record): string => Number::currency($state / 100, in: $record->currency))
-                    ->sortable(),
+                    ->formatStateUsing(fn (int $state, Plan $record): string => Number::currency($state / 100, in: $record->currency))
+                    ->sortable()
+                    ->alignCenter()
+                    ->tooltip(fn (Plan $record): string => Number::currency($record->price_yearly / 100, in: $record->currency))
+                    ->toggleable(),
 
+                // 5. Subscribers Badge (Centered + Toggleable)
                 TextColumn::make('mock_subscriber_count')
                     ->label('Subscribers')
                     ->badge()
                     ->color('info')
-                    ->sortable(),
+                    ->sortable()
+                    ->alignCenter()
+                    ->toggleable(),
 
+                // 6. Active Toggle (Centered + Toggleable)
                 ToggleColumn::make('is_active')
                     ->label('Active')
                     ->sortable()
                     ->alignCenter()
-                    ->disabled(fn(): bool => ! auth()->user()->can('toggle_plan_status')),
+                    ->disabled(fn (): bool => ! auth()->user()->can('toggle_plan_status'))
+                    ->toggleable(),
 
+                // 7. Featured Toggle (Centered + Info Color + Toggleable)
                 ToggleColumn::make('is_featured')
                     ->label('Featured')
+                    ->onColor('info')
                     ->sortable()
                     ->alignCenter()
-                    ->disabled(fn(): bool => ! auth()->user()->can('feature_saas_plans')),
+                    ->disabled(fn (): bool => ! auth()->user()->can('feature_saas_plans'))
+                    ->toggleable(),
+
+                // 8. Creation Timestamp (Centered Gray Badge with Exact Datetime Tooltip)
+                TextColumn::make('created_at')
+                    ->label('Created')
+                    ->badge()
+                    ->color('gray')
+                    ->dateTime('M d, Y')
+                    ->sortable()
+                    ->alignCenter()
+                    ->tooltip(fn (Plan $record): ?string => $record->created_at?->format('M d, Y - h:i A'))
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 TernaryFilter::make('is_active')
-                    ->label('Status'),
+                    ->label('Active Status'),
+
+                TernaryFilter::make('is_featured')
+                    ->label('Featured Status'),
             ])
             ->recordActions([
+                // Edit Action: Outlined info button with slide-over
                 EditAction::make()
                     ->slideOver()
-                    ->color('gray'),
-                DeleteAction::make(),
+                    ->color('info')
+                    ->button()
+                    ->outlined()
+                    ->size('sm')
+                    ->iconSize('sm'),
+
+                // Delete Action: Outlined primary button with trash icon
+                DeleteAction::make()
+                    ->color('primary')
+                    ->icon('heroicon-o-trash')
+                    ->button()
+                    ->outlined()
+                    ->size('sm')
+                    ->iconSize('sm'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

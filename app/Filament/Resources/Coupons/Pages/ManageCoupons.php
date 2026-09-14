@@ -16,6 +16,7 @@ class ManageCoupons extends ManageRecords
     {
         return [
             CreateAction::make()
+                ->icon('heroicon-o-plus-circle')
                 ->slideOver(),
         ];
     }
