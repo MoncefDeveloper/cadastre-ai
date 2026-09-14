@@ -55,11 +55,15 @@ class Inbox extends Page implements HasForms
 
     public static function getNavigationBadge(): ?string
     {
-        $count = Thread::where('is_unread', true)->count();
+        $user = auth()->user();
+        $isAgent = $user && $user->hasRole('Senior Agent');
+
+        $count = Thread::where('is_unread', true)
+            ->when($isAgent, fn($q) => $q->where('assigned_user_id', $user->id))
+            ->count();
 
         return $count > 0 ? (string) $count : null;
     }
-
     public static function getNavigationBadgeColor(): ?string
     {
         return 'warning';
@@ -96,7 +100,7 @@ class Inbox extends Page implements HasForms
         return Thread::with([
             'client',
             // Order newest first so recent replies appear at the top of chat history
-            'messages' => fn ($q) => $q->orderBy('created_at', 'desc'),
+            'messages' => fn($q) => $q->orderBy('created_at', 'desc'),
             'propertyMatches.property.category',
         ])->find($this->activeThreadId);
     }

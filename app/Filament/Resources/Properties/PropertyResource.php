@@ -57,7 +57,12 @@ class PropertyResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $count = Property::where('status', PropertyStatus::AVAILABLE)->count();
+        $user = auth()->user();
+        $isAgent = $user && $user->hasRole('Senior Agent');
+
+        $count = Property::where('status', PropertyStatus::AVAILABLE)
+            ->when($isAgent, fn($q) => $q->where('agent_id', $user->id))
+            ->count();
 
         return $count > 0 ? (string) $count : null;
     }

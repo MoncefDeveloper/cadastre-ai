@@ -128,13 +128,13 @@
 
             <div class="flex items-center justify-between gap-2">
                 <p class="text-[13px] leading-tight truncate {{ $thread->is_unread ? 'font-semibold text-gray-800 dark:text-gray-200' : 'text-gray-500 dark:text-gray-400' }}"
-                   title="{{ $thread->subject ?? 'No Subject' }}">
+                    title="{{ $thread->subject ?? 'No Subject' }}">
                     {{ str($thread->subject ?? 'No Subject')->limit(30) }}
                 </p>
 
                 <!-- Unread Indicator (Amber Pulse Beacon) -->
                 @if($thread->is_unread)
-                <div class="shrink-0 w-2 h-2 rounded-full bg-primary-600 shadow-[0_0_8px_rgba(var(--primary-600),0.6)]"></div>
+                <div class="shrink-0 w-2 h-2 rounded-full bg-primary-600 shadow-xs shadow-primary-500/50"></div>
                 @endif
             </div>
         </div>
