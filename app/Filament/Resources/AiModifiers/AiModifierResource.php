@@ -21,7 +21,9 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
@@ -60,8 +62,6 @@ class AiModifierResource extends Resource
         ];
     }
 
-
-
     public static function getNavigationBadge(): ?string
     {
         $count = AiModifier::where('is_active', true)->count();
@@ -84,6 +84,7 @@ class AiModifierResource extends Resource
         return $schema
             ->components([
                 Section::make('Modifier Configuration')
+                    ->description('Define button text, prompt instructions, and agent authorization scope.')
                     ->headerActions([
                         Action::make('autofill')
                             ->label('Quick Fill')
@@ -100,36 +101,65 @@ class AiModifierResource extends Resource
                     ])
                     ->schema([
                         TextInput::make('label')
+                            ->label('Modifier Label')
+                            ->prefixIcon('heroicon-m-sparkles')
                             ->required()
-                            ->placeholder('e.g., Make it Shorter'),
+                            ->maxLength(255)
+                            ->placeholder('e.g., Make it Shorter')
+                            ->validationMessages([
+                                'required' => 'Please enter a clear label for this modifier button.',
+                                'max' => 'The modifier label cannot exceed 255 characters.',
+                            ]),
 
                         Textarea::make('instruction')
-                            ->placeholder('e.g., Rewrite the draft to be less than 50 words.')
-                            ->columnSpanFull(),
+                            ->label('AI Rewrite Instruction')
+                            ->required()
+                            ->maxLength(1000)
+                            ->rows(4)
+                            ->placeholder('e.g., Rewrite the draft to be strictly under 50 words. Focus exclusively on price and viewing availability.')
+                            ->columnSpanFull()
+                            ->validationMessages([
+                                'required' => 'Please provide the prompt rewrite instructions for the AI.',
+                                'max' => 'The instruction prompt cannot exceed 1,000 characters.',
+                            ]),
 
                         Select::make('user_id')
                             ->relationship('user', 'name')
                             ->searchable()
                             ->preload()
+                            ->native(false)
                             ->label('Agent Specific (Optional)')
-                            ->helperText('Leave empty to make this a Global button for everyone.')
-                            ->default(fn() => auth()->id())
-                            ->disabled(fn(): bool => ! auth()->user()->can('manage_global_ai_modifiers'))
+                            ->placeholder('Global Modifier (All Agents)')
+                            ->helperText('Leave unassigned to make this shortcut accessible to all agents agency-wide.')
+                            ->default(fn () => auth()->id())
+                            ->disabled(fn (): bool => ! auth()->user()->can('manage_global_ai_modifiers'))
                             ->dehydrated(true),
 
                         Select::make('color')
+                            ->label('Tone Badge Palette')
                             ->options([
                                 'primary' => 'Primary (Carmine)',
-                                'success' => 'Success (Green)',
-                                'warning' => 'Warning (Orange)',
-                                'danger' => 'Danger (Coral)',
-                                'gray' => 'Gray',
+                                'success' => 'Success (Emerald)',
+                                'warning' => 'Warning (Amber)',
+                                'danger'  => 'Danger (Coral)',
+                                'gray'    => 'Gray (Neutral)',
                             ])
                             ->default('primary')
-                            ->required(),
+                            ->required()
+                            ->native(false)
+                            ->validationMessages([
+                                'required' => 'Please select a visual tone badge color.',
+                            ]),
 
                         Toggle::make('is_active')
-                            ->default(true),
+                            ->label('Active Status')
+                            ->default(true)
+                            ->disabled(
+                                fn (?AiModifier $record): bool =>
+                                $record !== null &&
+                                $record->user_id !== auth()->id() &&
+                                ! auth()->user()->can('toggle_modifier_status')
+                            ),
                     ])->columnSpanFull(),
             ]);
     }
@@ -137,34 +167,96 @@ class AiModifierResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->checkIfRecordIsSelectableUsing(fn(Model $record): bool => ! method_exists($record, 'isBaselineRecord') || ! $record->isBaselineRecord() || auth()->id() === 1)
+            ->checkIfRecordIsSelectableUsing(fn (Model $record): bool => ! method_exists($record, 'isBaselineRecord') || ! $record->isBaselineRecord() || auth()->id() === 1)
+            ->reorderable('sort_order')
+            ->defaultSort('sort_order', 'asc')
+            ->emptyStateHeading('No AI modifiers found')
+            ->emptyStateDescription('Create quick-action prompt modifiers for the AI copilot.')
+            ->emptyStateIcon('heroicon-o-sparkles')
             ->columns([
-                TextColumn::make('label')->searchable(),
-                TextColumn::make('instruction')->limit(50),
-                TextColumn::make('user.name')->label('Scope')->default('Global'),
-                TextColumn::make('color')->badge()->color(fn(string $state): string => $state),
+                // 1. Label (Max 30 Chars + Hover Tooltip)
+                TextColumn::make('label')
+                    ->label('Modifier Label')
+                    ->searchable()
+                    ->sortable()
+                    ->limit(30)
+                    ->tooltip(fn (AiModifier $record): ?string => $record->label),
 
+                // 2. Prompt Instruction (Max 30 Chars + Tooltip + Toggleable)
+                TextColumn::make('instruction')
+                    ->label('AI Prompt Instruction')
+                    ->limit(30)
+                    ->tooltip(fn (AiModifier $record): ?string => $record->instruction)
+                    ->toggleable(),
+
+                // 3. Scope (Centered + Tooltip + Toggleable)
+                TextColumn::make('user.name')
+                    ->label('Scope')
+                    ->default('Global')
+                    ->alignCenter()
+                    ->tooltip(fn (AiModifier $record): string => $record->user_id ? "Agent: {$record->user?->name}" : 'Global Shortcut')
+                    ->toggleable(),
+
+                // 4. Tone Badge (Centered + Toggleable)
+                TextColumn::make('color')
+                    ->label('Tone')
+                    ->badge()
+                    ->alignCenter()
+                    ->color(fn (string $state): string => $state)
+                    ->toggleable(),
+
+                // 5. Active Status Toggle (Centered + Toggleable)
                 ToggleColumn::make('is_active')
+                    ->label('Active')
+                    ->alignCenter()
+                    ->sortable()
                     ->disabled(
-                        fn(AiModifier $record): bool =>
+                        fn (AiModifier $record): bool =>
                         $record->user_id !== auth()->id() &&
                             ! auth()->user()->can('toggle_modifier_status')
-                    ),
-            ])
-            ->reorderable('sort_order')
-            ->filters([])
-            ->recordActions([
-                EditAction::make()
-                    ->modalWidth('md')
+                    )
+                    ->toggleable(),
+
+                // 6. Creation Timestamp (Centered Gray Badge with Exact Datetime Tooltip)
+                TextColumn::make('created_at')
+                    ->label('Created')
+                    ->badge()
                     ->color('gray')
+                    ->dateTime('M d, Y')
+                    ->sortable()
+                    ->alignCenter()
+                    ->tooltip(fn (AiModifier $record): ?string => $record->created_at?->format('M d, Y - h:i A'))
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                TernaryFilter::make('is_active')
+                    ->label('Active Status'),
+            ])
+            ->recordActions([
+                // Edit Action: Outlined info button
+                EditAction::make()
+                    ->modalWidth('lg')
+                    ->color('info')
+                    ->button()
+                    ->outlined()
+                    ->size('sm')
+                    ->iconSize('sm')
                     ->visible(
-                        fn(AiModifier $record): bool =>
+                        fn (AiModifier $record): bool =>
                         $record->user_id === auth()->id() ||
                             auth()->user()->can('manage_global_ai_modifiers')
                     ),
+
+                // Delete Action: Outlined primary button
                 DeleteAction::make()
+                    ->color('primary')
+                    ->icon('heroicon-o-trash')
+                    ->button()
+                    ->outlined()
+                    ->size('sm')
+                    ->iconSize('sm')
                     ->visible(
-                        fn(AiModifier $record): bool =>
+                        fn (AiModifier $record): bool =>
                         $record->user_id === auth()->id() ||
                             auth()->user()->can('manage_global_ai_modifiers')
                     ),
@@ -183,7 +275,7 @@ class AiModifierResource extends Resource
         ];
     }
 
-    public static function getGlobalSearchEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    public static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()->with(['user']);
     }

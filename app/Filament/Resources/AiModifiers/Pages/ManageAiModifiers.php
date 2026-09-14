@@ -16,7 +16,8 @@ class ManageAiModifiers extends ManageRecords
     {
         return [
             CreateAction::make()
-                ->modalWidth('md'),
+                ->icon('heroicon-o-plus-circle')
+                ->modalWidth('lg'),
         ];
     }
 }

@@ -66,6 +66,8 @@ body,
 .fi-topbar {
     border-bottom: none !important;
     box-shadow: none !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+            backdrop-filter: blur(20px) !important;
 }
 
 /* ==========================================================================
