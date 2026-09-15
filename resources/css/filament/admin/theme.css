@@ -66,8 +66,36 @@ body,
 .fi-topbar {
     border-bottom: none !important;
     box-shadow: none !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-            backdrop-filter: blur(20px) !important;
+}
+
+.dark .fi-topbar,
+html:not(.dark) .fi-topbar {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 0 !important;
+    background-color: transparent !important;
+}
+
+/* Dark Mode Frosted Glass Shield (Immune to Modal Trap) */
+.dark .fi-topbar::before {
+    content: '' !important;
+    position: absolute !important;
+    inset: 0 !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    backdrop-filter: blur(16px) !important;
+    z-index: -1 !important;
+    pointer-events: none !important;
+}
+
+/* Light Mode Frosted Glass Shield */
+html:not(.dark) .fi-topbar::before {
+    content: '' !important;
+    position: absolute !important;
+    inset: 0 !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    backdrop-filter: blur(16px) !important;
+    z-index: -1 !important;
+    pointer-events: none !important;
 }
 
 /* ==========================================================================
@@ -139,26 +167,54 @@ html:not(.dark) *::-webkit-scrollbar-thumb:hover {
     direction: rtl !important;
 }
 
-.fi-sidebar nav > *,
-.fi-sidebar-nav > * {
+.fi-sidebar nav>*,
+.fi-sidebar-nav>* {
     direction: ltr !important;
 }
 
 
 @-webkit-keyframes cadWaveHand {
-    0%, 100% { transform: rotate(0deg); }
-    20% { transform: rotate(16deg); }
-    40% { transform: rotate(-10deg); }
-    60% { transform: rotate(14deg); }
-    80% { transform: rotate(-4deg); }
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+
+    20% {
+        transform: rotate(16deg);
+    }
+
+    40% {
+        transform: rotate(-10deg);
+    }
+
+    60% {
+        transform: rotate(14deg);
+    }
+
+    80% {
+        transform: rotate(-4deg);
+    }
 }
 
 @keyframes cadWaveHand {
-    0%, 100% { transform: rotate(0deg); }
-    20% { transform: rotate(16deg); }
-    40% { transform: rotate(-10deg); }
-    60% { transform: rotate(14deg); }
-    80% { transform: rotate(-4deg); }
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+
+    20% {
+        transform: rotate(16deg);
+    }
+
+    40% {
+        transform: rotate(-10deg);
+    }
+
+    60% {
+        transform: rotate(14deg);
+    }
+
+    80% {
+        transform: rotate(-4deg);
+    }
 }
 
 .animate-waving-hand {
@@ -167,4 +223,3 @@ html:not(.dark) *::-webkit-scrollbar-thumb:hover {
     -webkit-animation: cadWaveHand 2.4s infinite ease-in-out;
     animation: cadWaveHand 2.4s infinite ease-in-out;
 }
-
