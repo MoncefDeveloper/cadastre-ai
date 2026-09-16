@@ -1,0 +1,169 @@
+/* ==========================================================================
+   Cadastre AI - Hero Welcome Banner Styling & Saturated Gradients
+   ========================================================================== */
+
+/* 1. Base / Light Mode: Lighter, more vibrant Carmine gradient */
+.cad-hero-banner {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.5rem;
+    padding: 2.25rem 2.5rem;
+    color: #ffffff;
+    box-shadow: 0 15px 30px -10px rgba(190, 18, 60, 0.25);
+    background: linear-gradient(135deg, #cb1a45 0%, #be123c 50%, #9f1239 100%);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 2. Dark Mode: Deeper, darker Bordeaux wine gradient blending with Cold Obsidian */
+.dark .cad-hero-banner {
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+    background: linear-gradient(135deg, #880e2f 0%, #5f1127 50%, #2a030e 100%);
+}
+
+/* 3. Subtle Blueprint Architectural Grid Overlay */
+.cad-hero-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.06;
+    background-image:
+        linear-gradient(to right, #ffffff 1px, transparent 1px),
+        linear-gradient(to bottom, #ffffff 1px, transparent 1px);
+    background-size: 48px 48px;
+}
+
+.dark .cad-hero-grid {
+    background-image:
+        linear-gradient(to right, #ffffff80 1px, transparent 1px),
+        linear-gradient(to bottom, #ffffff80 1px, transparent 1px);
+}
+
+/* 4. Ambient Radial Glow Orb */
+.cad-hero-glow {
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 350px;
+    height: 350px;
+    border-radius: 9999px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* 5. Two-Column Hero Layout */
+.cad-hero-layout {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    width: 100%;
+}
+
+.cad-hero-left {
+    flex: 1;
+    min-width: 0;
+}
+
+.cad-hero-title {
+    font-size: 2.25rem !important;
+    font-weight: 800 !important;
+    line-height: 1.15 !important;
+    color: #ffffff !important;
+    margin: 0.75rem 0 0.5rem 0 !important;
+    letter-spacing: -0.02em !important;
+}
+
+.cad-hero-subtitle {
+    font-size: 0.95rem !important;
+    font-weight: 400 !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+    line-height: 1.5 !important;
+    margin: 0 !important;
+    max-width: 600px;
+}
+
+/* 6. Status Pills & Micro Badges */
+.cad-hero-pill-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.625rem;
+    margin-top: 1.5rem;
+}
+
+.cad-hero-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.cad-hero-badge-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+}
+
+/* 7. Floating Frosted Glass Card (Right Column) */
+.cad-hero-card-right {
+    width: 220px;
+    min-width: 220px;
+    padding: 1.5rem 1.25rem;
+    border-radius: 1.25rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.cad-hero-stat-number {
+    font-size: 3rem !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    color: #ffffff !important;
+    margin: 0.35rem 0 0.5rem 0 !important;
+    letter-spacing: -0.03em !important;
+}
+
+/* 8. Mobile Responsiveness (<= 900px) */
+@media (max-width: 900px) {
+    .cad-hero-layout {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .cad-hero-card-right {
+        width: 100%;
+        min-width: 100%;
+    }
+
+    .cad-hero-title {
+        font-size: 1.75rem !important;
+    }
+}
