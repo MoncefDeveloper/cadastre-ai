@@ -26,11 +26,14 @@ class CrmStatsOverview extends BaseWidget
     protected ?string $pollingInterval = '30s';
 
     /**
-     * 📐 Layout: Exactly 2 cards per row
+     * 📐 Layout: Exactly 3 cards on a single row (responsive on mobile)
      */
-    protected function getColumns(): int
+    protected function getColumns(): int | array
     {
-        return 2;
+        return [
+            'default' => 1,
+            'md'      => 3,
+        ];
     }
 
     protected function getStats(): array
@@ -115,8 +118,9 @@ class CrmStatsOverview extends BaseWidget
             ->color('warning');
 
         // =========================================================================
-        // CARD 4: FHA AI COMPLIANCE RATE (Zero-Division Safeguard)
+        // CARD 4: FHA AI COMPLIANCE RATE (Temporarily Disabled)
         // =========================================================================
+        /*
         $totalAiMessages = Message::where('is_ai_generated', true)->count();
         $complianceRate = $totalAiMessages > 0 ? '98.4%' : '100%';
 
@@ -128,12 +132,13 @@ class CrmStatsOverview extends BaseWidget
             ->descriptionIcon('heroicon-m-shield-check')
             ->chart([94, 96, 95, 98, 97, 99, 98])
             ->color('success');
+        */
 
         return [
             $portfolioCard,
             $inventoryCard,
             $inboxCard,
-            $complianceCard,
+            // $complianceCard,
         ];
     }
 }
