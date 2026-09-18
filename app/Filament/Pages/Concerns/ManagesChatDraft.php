@@ -204,6 +204,7 @@ trait ManagesChatDraft
             $this->activeDraft->delete();
             $this->activeDraft = null;
             $this->draftForm->fill([]);
+            unset($this->activeThread);
         }
 
         $this->draftUpdatedAt = null;

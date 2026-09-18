@@ -1,5 +1,4 @@
-<div x-show="aiBrainTab === 'ai'" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-5" @if($isGeneratingDraft) wire:poll.2s="checkDraftStatus" @endif>
-
+<div x-show="aiBrainTab === 'ai'" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-5">
     <!-- Cadastre Tokenized Summary Box (Dual-Mode Gradient Stop Override) -->
     <div class="rounded-xl p-[1px] bg-gradient-to-r from-primary-500/25 via-primary-500/10 to-info-500/25 border border-primary-500/20 dark:border-primary-500/30 shadow-xs">
         <div class="rounded-[11px] bg-gradient-to-br from-primary-50/40 via-white to-info-50/30 dark:from-primary-950/40 dark:via-gray-900 dark:to-info-950/30 p-4 relative overflow-hidden backdrop-blur-xs">
@@ -20,7 +19,7 @@
         <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Suggested Reply</h4>
 
         @if($isGeneratingDraft)
-        <div class="relative p-[1px] rounded-xl bg-gradient-to-r from-primary-500 via-rose-500 to-info-500 animate-pulse shadow-xs">
+        <div wire:key="ai-draft-generating-{{ $this->activeThreadId }}" wire:poll.2s="checkDraftStatus" class="relative p-[1px] rounded-xl bg-gradient-to-r from-primary-500 via-rose-500 to-info-500 animate-pulse shadow-xs">
             <div class="bg-white dark:bg-gray-900 rounded-xl p-8 flex flex-col items-center justify-center text-center">
                 <x-heroicon-s-sparkles class="w-8 h-8 text-primary-500 mb-3 animate-bounce" />
                 <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-1">AI is writing...</h4>
@@ -62,11 +61,11 @@
         <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">✨ Refine Draft</h4>
         <div class="p-4 border border-gray-200 dark:border-white/10 rounded-xl shadow-xs bg-white dark:bg-gray-900 flex flex-wrap gap-2">
             @foreach($this->activeModifiers as $modifier)
-                <button type="button" wire:click="applyAiModifier({{ $modifier->id }})" class="focus:outline-hidden hover:scale-105 transition-transform active:scale-95" title="{{ $modifier->instruction }}">
-                    <x-filament::badge color="{{ $modifier->color }}" size="md">
-                        {{ $modifier->label }}
-                    </x-filament::badge>
-                </button>
+            <button type="button" wire:click="applyAiModifier({{ $modifier->id }})" class="focus:outline-hidden hover:scale-105 transition-transform active:scale-95" title="{{ $modifier->instruction }}">
+                <x-filament::badge color="{{ $modifier->color }}" size="md">
+                    {{ $modifier->label }}
+                </x-filament::badge>
+            </button>
             @endforeach
 
             @can('ViewAny:AiModifier')

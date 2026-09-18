@@ -111,8 +111,7 @@
 
         <!-- Chat History (Messages Rendered Newest First) -->
         <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-100/60 dark:bg-gray-950/40">
-            @foreach($this->activeThread()->messages as $message)
-            @if($message->is_draft) @continue @endif
+            @foreach($this->activeThread()->messages->where('is_draft', false) as $message)
 
             <div wire:key="msg-{{ $message->id }}" class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl shadow-xs overflow-hidden">
                 <div class="flex justify-between items-start p-4 border-b border-gray-100 dark:border-white/5 bg-gray-50/30 dark:bg-white/[0.02]">
@@ -137,32 +136,35 @@
                 </div>
 
                 <!-- Mandatory Shadow DOM Container with Adaptive Carmine Link Reset -->
-                <div class="p-5 text-sm text-gray-700 dark:text-gray-300 w-full overflow-hidden"
+                <!-- Mandatory Shadow DOM Container (wire:ignore prevents morphdom crash) -->
+                <div wire:ignore class="p-5 text-sm text-gray-700 dark:text-gray-300 w-full overflow-hidden"
                     x-data="{ html: @js($message->body_html ?? nl2br(e($message->body_text))) }"
                     x-init="
-                        const shadow = $el.attachShadow({ mode: 'open' });
-                        shadow.innerHTML = `
-                            <style>
-                                :host { display: block; font-family: inherit; color: inherit; line-height: 1.6; }
-                                div, p, span, font, td, th {
-                                    color: inherit !important;
-                                    font-family: inherit !important;
-                                }
-                                p { margin-top: 0; margin-bottom: 1em; }
-                                a {
-                                    color: var(--color-primary-600, #be123c) !important;
-                                    text-decoration: underline !important;
-                                    font-weight: 600;
-                                }
-                                @media (prefers-color-scheme: dark) {
-                                    a { color: var(--color-primary-400, #fb7185) !important; }
-                                }
-                                :host-context(.dark) a { color: var(--color-primary-400, #fb7185) !important; }
-                                ul, ol { margin-top: 0; margin-bottom: 1em; padding-left: 20px; }
-                                h1, h2, h3, h4, h5, h6 { font-weight: bold; margin-bottom: 0.5em; }
-                                img { max-width: 100%; height: auto; display: block; }
-                            </style>
-                            ` + html;
+                        if (! $el.shadowRoot) {
+                            const shadow = $el.attachShadow({ mode: 'open' });
+                            shadow.innerHTML = `
+                                <style>
+                                    :host { display: block; font-family: inherit; color: inherit; line-height: 1.6; }
+                                    div, p, span, font, td, th {
+                                        color: inherit !important;
+                                        font-family: inherit !important;
+                                    }
+                                    p { margin-top: 0; margin-bottom: 1em; }
+                                    a {
+                                        color: var(--color-primary-600, #be123c) !important;
+                                        text-decoration: underline !important;
+                                        font-weight: 600;
+                                    }
+                                    @media (prefers-color-scheme: dark) {
+                                        a { color: var(--color-primary-400, #fb7185) !important; }
+                                    }
+                                    :host-context(.dark) a { color: var(--color-primary-400, #fb7185) !important; }
+                                    ul, ol { margin-top: 0; margin-bottom: 1em; padding-left: 20px; }
+                                    h1, h2, h3, h4, h5, h6 { font-weight: bold; margin-bottom: 0.5em; }
+                                    img { max-width: 100%; height: auto; display: block; }
+                                </style>
+                                ` + html;
+                        }
                      ">
                 </div>
             </div>
@@ -302,11 +304,11 @@
         <x-filament::modal id="rate-details-modal" width="2xl">
             @if($ratingResult)
             @php
-                $gradeColor = match(true) {
-                    $ratingResult['score'] >= 8 => '#10b981', // Emerald (matches Filament success)
-                    $ratingResult['score'] >= 5 => '#f59e0b', // Amber (matches Filament warning)
-                    default => '#ef4444',                     // Coral Red (matches Filament danger)
-                };
+            $gradeColor = match(true) {
+            $ratingResult['score'] >= 8 => '#10b981', // Emerald (matches Filament success)
+            $ratingResult['score'] >= 5 => '#f59e0b', // Amber (matches Filament warning)
+            default => '#ef4444', // Coral Red (matches Filament danger)
+            };
             @endphp
             <x-slot name="heading">
                 <div class="flex items-center gap-3">

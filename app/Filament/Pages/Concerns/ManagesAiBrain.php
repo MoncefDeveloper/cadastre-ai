@@ -107,7 +107,6 @@ trait ManagesAiBrain
 
         if (!$template || !$thread) return;
 
-        // Verification Logging
         \Illuminate\Support\Facades\Log::info('[Template Verification] Initiating Template Application', [
             'agent' => $user ? $user->toArray() : 'System',
             'template_details' => $template->toArray(),
@@ -118,6 +117,7 @@ trait ManagesAiBrain
             $this->activeDraft->delete();
             $this->activeDraft = null;
             $this->draftForm->fill([]);
+            unset($this->activeThread);
         }
 
         $this->draftUpdatedAt = null;
