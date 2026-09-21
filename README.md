@@ -1,4 +1,3 @@
-```markdown
 <div align="center">
 
 # Cadastre AI
@@ -230,4 +229,3 @@ This project is open-sourced software licensed under the [MIT license](LICENSE).
 <div align="center">
   <sub>Architected & Engineered by <strong>Moncef Dev</strong> (<a href="https://moncefdev.me">moncefdev.me</a>)</sub>
 </div>
-```
