@@ -1,32 +1,37 @@
 <div align="center">
 
 # Cadastre AI
-### Enterprise Autonomous Real Estate Shared Inbox & Compliance CRM
+### Enterprise AI Shared Inbox & Compliance CRM for Real Estate Brokerages
 
-[![PHP Version](https://img.shields.io/badge/PHP-8.3%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
-[![Laravel](https://img.shields.io/badge/Laravel-13.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
-[![Filament](https://img.shields.io/badge/Filament-v5.x-F59E0B?style=for-the-badge&logo=filament&logoColor=white)](https://filamentphp.com)
-[![Livewire](https://img.shields.io/badge/Livewire-v4.x-4E56A6?style=for-the-badge&logo=livewire&logoColor=white)](https://livewire.laravel.com)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.x-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
-[![Google Gemini](https://img.shields.io/badge/Google_Gemini-3.5_Flash--Lite-8E75C2?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev)
-[![Postmark](https://img.shields.io/badge/Postmark-Inbound_%26_Outbound-FFE01B?style=for-the-badge&logo=postmark&logoColor=black)](https://postmarkapp.com)
-[![License: MIT](https://img.shields.io/badge/License-MIT-BE123C?style=for-the-badge)](LICENSE)
+[![PHP Version](https://img.shields.io/badge/PHP-8.3%2B-777BB4?style=flat-square&logo=php&logoColor=white)](https://php.net)
+[![Laravel](https://img.shields.io/badge/Laravel-13.x-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com)
+[![Filament](https://img.shields.io/badge/Filament-v5.x-F59E0B?style=flat-square&logo=filament&logoColor=white)](https://filamentphp.com)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.x-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+[![Google Gemini](https://img.shields.io/badge/Google_Gemini-3.5_Flash--Lite-8E75C2?style=flat-square&logo=google&logoColor=white)](https://ai.google.dev)
+[![Postmark](https://img.shields.io/badge/Postmark-Inbound_%26_Outbound-FFE01B?style=flat-square&logo=postmark&logoColor=black)](https://postmarkapp.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-BE123C?style=flat-square)](LICENSE)
 
 <p align="center">
-  A high-scale, regulatory-compliant AI Shared Inbox and Brokerage CRM built for sovereign real estate firms. Features autonomous lead criteria extraction, dynamic inventory matching, Fair Housing Act (FHA) compliance grading, and headless API integration for Framer Edge frontends.
+  A high-scale real estate shared inbox and CRM engine that automates lead intake, extracts buyer search criteria via Google Gemini AI, matches inventory in real time, and audits outgoing agent replies for Fair Housing Act (FHA) regulatory compliance.
 </p>
 
-[Explore Architecture](#system-architecture) • [Live Marketing Frontend](https://cadastre.framer.ai) • [Demo Credentials](#demo-personas--role-directory)
+[Architecture](#system-architecture) • [Live Marketing Frontend](https://cadastre.framer.ai) • [Headless APIs](#public-headless-apis-v1) • [Demo Accounts](#demo-personas--role-directory) • [Setup Guide](#local-installation)
 
 </div>
 
 ---
 
-## Executive Summary
+## The Problem & The Solution
 
-**Cadastre AI** bridges the gap between high-volume inbound client communications and strict real estate regulatory compliance. Operating on top of **Google Gemini 3.5 Flash-Lite** and **Postmark**, the platform intercepts inbound emails, extracts structured buyer requirements (budget, target location, bedroom counts, property classifications), and calculates real-time inventory compatibility scores (85%–98%) against active portfolios.
+High-volume real estate brokerages face two primary operational bottlenecks:
+1. **Inbound Lead Triage:** Inquiries come in through email, webforms, and portals at all hours. Manually reading, extracting budgets, locations, and property requirements, and cross-referencing available inventory takes hours of agent time.
+2. **Regulatory & Compliance Risk:** Under Title VIII of the Civil Rights Act (Fair Housing Act), agents who use subjective neighborhood descriptors (e.g., *"safe"*, *"quiet"*, *"family-friendly"*) or steer clients based on demographics face severe legal liability and license revocation.
 
-Before an agent can dispatch an outgoing reply, the built-in **AI Compliance Officer** audits the draft against Title VIII of the Civil Rights Act (Fair Housing Act), scanning for prohibited demographic steering, protected class mentions, and restricted neighborhood descriptors.
+**Cadastre AI** automates this entire pipeline:
+* **Ingestion:** Inbound emails are received via Postmark webhooks and parsed into unified conversation threads.
+* **Extraction:** Google Gemini AI extracts buyer parameters (budget, target location, bedrooms, property types) into structured JSON.
+* **Inventory Match:** Active listings are matched against extracted requirements with real-time compatibility scores (85%–98%).
+* **Compliance Gate:** Outbound email drafts are automatically graded for FHA compliance before sending, flagging steering or restricted descriptors.
 
 ---
 
@@ -40,24 +45,23 @@ Before an agent can dispatch an outgoing reply, the built-in **AI Compliance Off
                                                   │ Headless JSON APIs
                                                   ▼
 ┌───────────────────────┐        ┌─────────────────────────────────┐
-│ Postmark MX Inbound   ├───────►│  API Perimeter (CORS / Throttle)│
+│ Postmark Inbound MX   ├───────►│ API Perimeter (CORS & Throttle) │
 └───────────────────────┘        └────────────────┬────────────────┘
                                                   │
                                                   ▼
                                  ┌─────────────────────────────────┐
                                  │ Laravel 13 Core Application     │
                                  ├─────────────────────────────────┤
-                                 │ • ForceJsonResponse Middleware   │
-                                 │ • Database Cache Layer          │
-                                 │ • Database Queue Worker Engine  │
-                                 │ • Hybrid 30m Sliding Sandbox    │
+                                 │ • Database-Backed Cache & Queue │
+                                 │ • 30-Minute Self-Healing Engine │
+                                 │ • Postmark Zero-Bounce Guard    │
                                  └────────┬───────────────┬────────┘
                                           │               │
-                     Criteria Extraction  │               │ FHA Regulatory Grading
+                     Criteria Extraction  │               │ FHA Compliance Audit
                                           ▼               ▼
                                  ┌─────────────────────────────────┐
                                  │ Google Gemini 3.5 Flash-Lite    │
-                                 │ (Structured System Directives)  │
+                                 │ (Structured JSON Directives)    │
                                  └─────────────────────────────────┘
                                                   ▲
                                                   │
@@ -69,53 +73,37 @@ Before an agent can dispatch an outgoing reply, the built-in **AI Compliance Off
 
 ---
 
-## Core Engineering Invariants & Architectural Patterns
+## Key Features
 
-The engine enforces strict architectural patterns across every layer:
+### 1. Autonomous AI Inbox Copilot
+* **Multichannel Threading:** Inbound Postmark emails, portal webforms, and simulated leads are threaded into clean conversation timelines.
+* **Contextual Draft Generation:** Gemini AI drafts replies in the client's language, incorporating matched property links and executive brokerage tone.
+* **Prompt Modifiers:** Agents can apply instant AI modifiers (*"Make it Shorter"*, *"Executive Luxury Tone"*) with one click.
 
-* **Shadow DOM Email Isolation:** Inbound email rendering is encapsulated inside client-side Shadow DOM roots (`$el.attachShadow({ mode: 'open' })`) with `!important` style overrides to prevent third-party email CSS from leaking into Filament's dark chassis.
-* **Recursive Array Flattener:** Custom recursive iterator sanitization protects Livewire rich editors against nested component hydration crashes during AI prompt and evaluation transfers.
-* **Ghost Admin Pattern:** Master Root User `ID 1` is strictly excluded across all public presentations, Filament resource tables, global search indexes, and telemetry badges (`id != 1`).
-* **Hybrid Sandbox Self-Healing:** Baseline records (`id <= limit`) are protected by the `ProtectsBaseline` trait. Visitor-created test records operate within a 30-minute sliding grace window, automatically purged by a background scheduler (`demo:cleanup`).
-* **Zero-Bounce Outbound Interceptor:** Emails directed to `.test`, `.example`, `.invalid`, or `.localhost` domains are intercepted before hitting the Postmark API to protect external sender reputation scores.
-* **Regulatory Compliance Engine (SSOT):** `config/cadastre-rules.php` serves as the atomic Single Source of Truth for Fair Housing Act compliance grading and automated quality scoring.
-* **Perimeter Rate-Limiting & CORS Isolation:** Strict origin regex validation in `config/cors.php` authorizes `cadastre.framer.ai` and dynamic Framer preview subdomains with a 24-hour preflight cache (`86400` max-age).
-* **Defensive Anti-Spam Honeypot:** Unauthenticated lead endpoints enforce zero-write silent drops on populated honeypot tokens (`_cadastre_hp`), returning simulated `201 Created` receipts.
-* **Single-Envelope JSON Architecture:** Public read APIs deliver normalized `{"data": [...]}` envelopes directly to eliminate double-wrapping collisions on modern frontend consumers.
-* **Zero-CDN Typography Integrity:** System fonts are served locally via Plus Jakarta Sans with OpenType tabular figures (`tabular-nums`) to prevent font metric jitter and external CDN telemetry leaks.
+### 2. Fair Housing Act (FHA) Compliance Engine
+* Outgoing drafts are evaluated against regulatory rules in `config/cadastre-rules.php`.
+* Flags demographic steering, protected class mentions, and restricted subjective descriptors.
+* Grades drafts from **A to F** with an actionable critique and blocks non-compliant replies from being sent unless authorized.
 
----
+### 3. Self-Healing Live Demo Sandbox
+* Designed for safe public evaluation without data corruption.
+* Seeded baseline records (`id <= limit`) are protected against accidental deletion.
+* Any visitor-created records or edits operate on a **30-minute sliding window** and are automatically pruned by a scheduled background worker (`demo:cleanup`).
 
-## Design System & Tokens
-
-Cadastre AI features a custom high-contrast design system built specifically for mission-critical operations:
-
-* **Primary Brand Accent:** Imperial Carmine (`#BE123C` / `oklch(0.48 0.22 18.5)`)
-* **Signal Danger Accent:** Flame Vermilion (`#F95428` — 33° hue separation from Carmine)
-* **Dark Chassis Surface:** Cold Obsidian (`#05070B` canvas / `#0D1117` elevated cards)
-* **Light Chassis Surface:** Slate-50 (`#F8FAFC` canvas / `#FFFFFF` elevated cards)
+### 4. Deliverability Safeguards (Zero-Bounce Sinkhole)
+* Outbound emails sent to test domains (`.test`, `.example`, `.invalid`, `.localhost`) are intercepted before reaching Postmark.
+* Preserves production sender reputation and prevents bounce penalties during team evaluation.
 
 ---
 
-## Demo Personas & Role Directory
+## Public Headless APIs (v1)
 
-The application includes four pre-seeded personas configured in Filament's custom dual-card authentication screen:
+Built to feed the live marketing landing page ([cadastre.framer.ai](https://cadastre.framer.ai)) without direct database exposure.
 
-| Role | Demo Email | Access Scope |
-| :--- | :--- | :--- |
-| **Admin** | `admin@cadastre.test` | Platform Owner. Unrestricted CRUD, SaaS billing, AI modifier authoring, and compliance overrides. |
-| **Manager** | `manager@cadastre.test` | Compliance Director. Full operational oversight, closed-deal reopening, and compliance override authority. |
-| **Senior Agent** | `agent@cadastre.test` | Operational Broker. Full CRM actions, property management, subject to strict FHA compliance grading. |
-| **Guest** | `guest@cadastre.test` | Read-Only Evaluator. Safe exploratory inspection mode with all creation, editing, and deletion gates locked. |
+### 1. Commercial Pricing Plans
+`GET /api/v1/plans` — *Rate limit: 60 req/min (Cached)*
 
-*Default password for all personas:* `password`
-
----
-
-## Public Headless API Contracts (v1)
-
-### 1. Commercial Subscription Plans
-`GET /api/v1/plans` — *Cached via `saas_active_plans` (Rate limit: 60 req/min)*
+Delivers active subscription tiers, pricing in cents and dollars, dynamic annual discount calculations (*"2 Months Free"*), feature bullets, and operational limits.
 
 ```json
 {
@@ -124,7 +112,6 @@ The application includes four pre-seeded personas configured in Filament's custo
       "id": 2,
       "name": "Professional Broker",
       "slug": "professional-broker",
-      "description": "Complete AI shared inbox, unlimited draft refinements, and team collaboration.",
       "currency": "USD",
       "is_popular": true,
       "price": {
@@ -145,7 +132,9 @@ The application includes four pre-seeded personas configured in Filament's custo
 ```
 
 ### 2. Knowledge Base FAQs
-`GET /api/v1/faqs` — *Cached via `saas_active_faqs` (Rate limit: 60 req/min)*
+`GET /api/v1/faqs` — *Rate limit: 60 req/min (Cached)*
+
+Exposes published global FAQs. Internal agent documentation and billing notes are scoped out. XSS filters strip executable scripts while preserving rich text formatting.
 
 ```json
 {
@@ -163,6 +152,8 @@ The application includes four pre-seeded personas configured in Filament's custo
 ### 3. Advisory Lead Ingestion
 `POST /api/v1/contacts` — *Rate limit: 5 req/min per IP*
 
+Handles public webform submissions from the marketing site with pre-validation input sanitization, anti-spam honeypot protection, and automatic Filament admin notifications.
+
 ```json
 // Request Payload:
 {
@@ -171,7 +162,7 @@ The application includes four pre-seeded personas configured in Filament's custo
   "phone": "+213 656 711 226",
   "subject": "Diplomatic Villa in Hydra — Viewing Request",
   "message": "Coordinating an on-site confidential architectural inspection.",
-  "_cadastre_hp": ""
+  "_cadastre_hp": "" // Anti-spam honeypot (bots that fill this are silently dropped)
 }
 
 // Response (201 Created):
@@ -183,48 +174,63 @@ The application includes four pre-seeded personas configured in Filament's custo
 
 ---
 
-## Local Development & Setup
+## Demo Personas & Role Directory
+
+The login screen includes pre-configured personas to test authorization gates:
+
+| Role | Demo Account | Capabilities |
+| :--- | :--- | :--- |
+| **Admin** | `admin@cadastre.test` | Full platform control, SaaS billing, global AI modifiers, compliance bypass. |
+| **Manager** | `manager@cadastre.test` | Compliance Director. Supervises threads, can override FHA compliance, manage listings. |
+| **Agent** | `agent@cadastre.test` | Day-to-day CRM actions. Must pass FHA compliance before sending replies. Price overrides locked. |
+| **Guest** | `guest@cadastre.test` | Read-only inspection mode. All create, edit, and delete actions locked. |
+
+*Default password for all personas:* `password`
+
+---
+
+## Local Installation
 
 ### Prerequisites
-* PHP 8.3 or higher with `pdo_mysql`, `mbstring`, `bcmath`, `intl` extensions
+* PHP 8.3+ with `pdo_mysql`, `mbstring`, `intl`, `bcmath`
 * Composer 2.7+
 * Node.js 20+ & npm
 * MySQL 8.0+ or SQLite 3.35+
 
-### Installation Steps
+### Setup Commands
 
 ```bash
-# 1. Clone repository
+# 1. Clone repository & enter directory
 git clone https://github.com/MoncefDeveloper/cadastre-ai.git
 cd cadastre-ai
 
-# 2. Install PHP & JavaScript dependencies
+# 2. Install dependencies
 composer install
 npm install
 
-# 3. Environment configuration
+# 3. Configure environment
 cp .env.example .env
 php artisan key:generate
 
-# 4. Database execution & pristine seeding
+# 4. Run migrations and database seeders
 php artisan migrate:fresh --seed
 
-# 5. Compile assets and link public storage
+# 5. Build frontend assets and create storage symlink
 npm run build
 php artisan storage:link
 
-# 6. Run background workers and local server
+# 6. Start the local server and background queue
 php artisan serve
 php artisan queue:listen --tries=1
 ```
 
-Access the admin dashboard at `http://localhost:8000/admin`.
+Open `http://localhost:8000/admin` to access the CRM dashboard.
 
 ---
 
 ## License
 
-This project is open-sourced software licensed under the [MIT license](LICENSE).
+Open-sourced software licensed under the [MIT License](LICENSE).
 
 <div align="center">
   <sub>Architected & Engineered by <strong>Moncef Dev</strong> (<a href="https://moncefdev.me">moncefdev.me</a>)</sub>
