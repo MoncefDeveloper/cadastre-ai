@@ -1,28 +1,40 @@
 # ==============================================================================
-# STAGE 1: Frontend Asset Compilation (Node & Vite)
+# STAGE 1: PHP Vendor Dependencies (Needed for Filament theme CSS)
+# ==============================================================================
+FROM composer:2 AS vendor-builder
+
+WORKDIR /app
+
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --ignore-platform-reqs
+
+# ==============================================================================
+# STAGE 2: Frontend Asset Compilation (Node & Vite)
 # ==============================================================================
 FROM node:22-alpine AS frontend-builder
 
 WORKDIR /app
 
-# Copy package manifests first to leverage Docker layer caching
+# Copy package manifests & install Node dependencies
 COPY package.json package-lock.json ./
 RUN npm ci
 
-# Copy Vite source files and compile Tailwind v4 / Filament theme
+# Copy Filament vendor CSS from Stage 1 so Vite can resolve @import theme.css
+COPY --from=vendor-builder /app/vendor/filament ./vendor/filament
+
+# Copy source assets & compile Vite
 COPY resources ./resources
 COPY public ./public
 COPY vite.config.js ./
 RUN npm run build
 
 # ==============================================================================
-# STAGE 2: Production PHP 8.3 FPM + Nginx + Process Supervision
+# STAGE 3: Production PHP 8.3 FPM + Nginx + Process Supervision
 # ==============================================================================
 FROM php:8.3-fpm-bookworm
 
 WORKDIR /var/www/html
 
-# Prevent interactive prompts during apt installation
 ENV DEBIAN_FRONTEND=noninteractive
 
 # 1. Install System Dependencies & CLI Tools
@@ -61,10 +73,10 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # 4. Copy Application Source Code
 COPY . /var/www/html
 
-# 5. Copy Precompiled Vite Assets from Stage 1
+# 5. Copy Precompiled Vite Assets from Stage 2
 COPY --from=frontend-builder /app/public/build /var/www/html/public/build
 
-# 6. Install PHP Production Dependencies
+# 6. Install PHP Production Dependencies & Run Autoloader
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress
 
 # 7. Backup Baseline Seed Storage (For Hydration on Volume Mount)

@@ -293,6 +293,7 @@ composer install
 npm install
 
 # 3. Environment configuration
+# Mandatory keys: GEMINI_API_KEYS, POSTMARK_SERVER_TOKEN......
 cp .env.example .env
 php artisan key:generate
 
@@ -306,6 +307,7 @@ php artisan storage:link
 # 6. Start local server & background queue worker
 php artisan serve
 php artisan queue:listen --tries=1
+php artisan schedule:work
 ```
 
 Access the admin dashboard at `http://localhost:8000/admin`.
