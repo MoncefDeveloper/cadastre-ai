@@ -22,9 +22,10 @@ RUN npm ci
 # Copy Filament vendor CSS from Stage 1 so Vite can resolve @import theme.css
 COPY --from=vendor-builder /app/vendor/filament ./vendor/filament
 
-# Copy source assets & compile Vite
+# Copy source assets, public folder, AND application PHP code so Tailwind scans all classes
 COPY resources ./resources
 COPY public ./public
+COPY app ./app
 COPY vite.config.js ./
 RUN npm run build
 
