@@ -50,6 +50,8 @@ jobs:
           cp .env.example .env.testing
           sed -i 's/DB_CONNECTION=.*/DB_CONNECTION=sqlite/' .env.testing
           sed -i 's/DB_DATABASE=.*/DB_DATABASE=:memory:/' .env.testing
+          sed -i 's/SESSION_DRIVER=.*/SESSION_DRIVER=array/' .env.testing
+          sed -i 's/CACHE_STORE=.*/CACHE_STORE=array/' .env.testing
           php artisan key:generate --env=testing
 
       - name: Execute Automated Test Suite
