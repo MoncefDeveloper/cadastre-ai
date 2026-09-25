@@ -1,0 +1,84 @@
+name: Production CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+# Prevent resource exhaustion: cancel duplicate running jobs on rapid pushes
+concurrency:
+  group: production-deploy
+  cancel-in-progress: true
+
+jobs:
+  # ============================================================================
+  # STAGE 1: Continuous Integration (Automated Test Gate)
+  # ============================================================================
+  test-suite:
+    name: Automated Tests & Static Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP Environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, bcmath, gd, zip
+          coverage: none
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
+      - name: Cache Composer Dependencies
+        id: composer-cache
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Prepare In-Memory Test Environment
+        run: |
+          cp .env.example .env.testing
+          sed -i 's/DB_CONNECTION=.*/DB_CONNECTION=sqlite/' .env.testing
+          sed -i 's/DB_DATABASE=.*/DB_DATABASE=:memory:/' .env.testing
+          php artisan key:generate --env=testing
+
+      - name: Execute Automated Test Suite
+        run: php artisan test --env=testing
+
+  # ============================================================================
+  # STAGE 2: Continuous Deployment (Trigger Coolify Webhook)
+  # ============================================================================
+  deploy-to-production:
+    name: Trigger Coolify Production Deployment
+    needs: test-suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Dispatch Webhook to Coolify
+        run: |
+          echo "🚀 Quality gate passed. Triggering Coolify deployment..."
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.COOLIFY_DEPLOY_WEBHOOK }}")
+          HTTP_STATUS=$(echo "$RESPONSE" | tail -n 1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+
+          echo "HTTP Response Status: $HTTP_STATUS"
+          echo "Response Body: $BODY"
+
+          # Accept 200 (OK), 201 (Created), and 202 (Accepted)
+          if [ "$HTTP_STATUS" -ne 200 ] && [ "$HTTP_STATUS" -ne 201 ] && [ "$HTTP_STATUS" -ne 202 ]; then
+            echo "❌ Coolify rejected the deployment webhook (HTTP $HTTP_STATUS)."
+            exit 1
+          fi
+
+          echo "✅ Deployment signal acknowledged by Coolify."
