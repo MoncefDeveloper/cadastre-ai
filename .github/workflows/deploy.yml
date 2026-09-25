@@ -70,7 +70,8 @@ jobs:
       - name: Dispatch Webhook to Coolify
         run: |
           echo "🚀 Quality gate passed. Triggering Coolify deployment..."
-          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.COOLIFY_DEPLOY_WEBHOOK }}")
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.COOLIFY_DEPLOY_WEBHOOK }}" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}")
           HTTP_STATUS=$(echo "$RESPONSE" | tail -n 1)
           BODY=$(echo "$RESPONSE" | sed '$d')
 
