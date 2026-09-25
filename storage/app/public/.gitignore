@@ -1,2 +1,19 @@
+# 1. Ignore all uploaded files by default
 *
 !.gitignore
+
+# 2. Allow the category-icons folder, but ONLY the 4 placeholders
+!category-icons/
+category-icons/*
+!category-icons/category_placeholder (1).png
+!category-icons/category_placeholder (2).png
+!category-icons/category_placeholder (3).png
+!category-icons/category_placeholder (4).png
+
+# 3. Allow the properties folder, but ONLY the 4 placeholders
+!properties/
+properties/*
+!properties/home_placeholder.png
+!properties/home_placeholder_2.png
+!properties/home_placeholder_3.png
+!properties/home_placeholder_4.png
