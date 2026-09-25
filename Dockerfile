@@ -92,10 +92,6 @@ COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# 9. Configure Cron for Laravel's 30-Minute Sandbox Cleaner (demo:cleanup)
-RUN echo "* * * * * cd /var/www/html && php artisan schedule:run >> /dev/null 2>&1" > /etc/cron.d/laravel-scheduler && \
-    chmod 0644 /etc/cron.d/laravel-scheduler && \
-    crontab /etc/cron.d/laravel-scheduler
 
 # 10. Network & Lifecycle Entrypoint
 EXPOSE 80
