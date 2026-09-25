@@ -12,3 +12,7 @@ Schedule::command('demo:cleanup')
     ->everyThirtyMinutes()
     ->withoutOverlapping()
     ->runInBackground();
+
+Schedule::command('vigilance:prune')->daily();
+Schedule::command('vigilance:snapshot')->everyFiveMinutes();
+Schedule::command('vigilance:schedule-sync')->hourly();
