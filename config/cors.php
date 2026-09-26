@@ -14,28 +14,11 @@ return [
 
     'allowed_methods' => ['GET', 'POST', 'OPTIONS'],
 
-    // Explicit Production & Local Whitelist
-    'allowed_origins' => [
-        'https://cadastre.framer.ai',
-        'https://framer.com',
-        'https://app.framer.com',
-        env('FRONTEND_URL', 'https://cadastre.moncefdev.me'),
-        'http://localhost:3000',
-        'http://127.0.0.1:3000',
-    ],
+    'allowed_origins' => ['*'],
 
-    // Strict regex patterns allowing only Framer preview & CDN subdomains
-    'allowed_origins_patterns' => [
-        '#^https://.*\.framer\.(app|website|ai|com|wiki)$#',
-        '#^https://.*\.framerusercontent\.com$#',
-    ],
+    'allowed_origins_patterns' => [],
 
-    'allowed_headers' => [
-        'Content-Type',
-        'Accept',
-        'Authorization',
-        'X-Requested-With',
-    ],
+    'allowed_headers' => ['*'],
 
     'exposed_headers' => [],
 
