@@ -16,13 +16,16 @@ return [
 
     'allowed_origins' => [
         'https://cadastre.framer.ai',
+        'https://framer.com',
+        'https://app.framer.com',
         env('FRONTEND_URL', 'https://cadastre.moncefdev.me'),
         'http://localhost:3000',
         'http://127.0.0.1:3000',
     ],
 
     'allowed_origins_patterns' => [
-        '#^https://.*\.framer\.(app|website|ai)$#',
+        '#^https://.*\.framer\.(app|website|ai|com|wiki)$#',
+        '#^https://.*\.framerusercontent\.com$#',
     ],
 
     'allowed_headers' => [
