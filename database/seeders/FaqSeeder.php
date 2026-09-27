@@ -73,6 +73,42 @@ class FaqSeeder extends Seeder
                 'is_active' => true,
                 'sort_order' => 6,
             ],
+
+            [
+                'id' => 7,
+                'question' => 'Does Cadastre AI replace our existing email client, or does it integrate with Gmail and Outlook?',
+                'answer' => '<p>Cadastre AI integrates non-invasively alongside your existing email infrastructure. Through <strong>Postmark inbound webhooks</strong> and cryptographic mailbox hashing (<code>th_*</code>), client emails sent from Gmail, Outlook, or web forms are triaged and drafted automatically without requiring agents to abandon their corporate email domains.</p>',
+                'target_audience' => 'global',
+                'is_active' => true,
+                'sort_order' => 7,
+            ],
+
+            [
+                'id' => 8,
+                'question' => 'How does the platform protect confidential off-market dossiers and investor privacy?',
+                'answer' => '<p>Confidentiality is enforced at both the database and AI prompt level. High-net-worth investor dossiers, acquisition budgets, and off-market deeds are isolated via <strong>Spatie Shield</strong> role authorization. Furthermore, Gemini API calls operate statelessly—your proprietary portfolio data and communications are <strong>never used to train public foundation models</strong>.</p>',
+                'target_audience' => 'global',
+                'is_active' => true,
+                'sort_order' => 8,
+            ],
+
+            [
+                'id' => 9,
+                'question' => 'How does the AI copilot differentiate between cold leads and returning private clients?',
+                'answer' => '<p>The copilot queries historical interaction threads in real time. For first-time inquiries, the AI introduces <strong>Cadastre Private Office</strong> and establishes brand authority. For returning clients, it suppresses corporate pleasantries and transitions directly into actionable next steps—such as proposing private viewing schedules or coordinating notary escrow documentation.</p>',
+                'target_audience' => 'global',
+                'is_active' => true,
+                'sort_order' => 9,
+            ],
+
+            [
+                'id' => 10,
+                'question' => 'Can our brokerage team simulate realistic inbound lead traffic before going live?',
+                'answer' => '<p>Yes. The platform includes an interactive <strong>Inbound Lead Simulator</strong> supporting custom inquiry payloads as well as curated diplomat/investor presets (Paris Haussmannian, Hydra Diplomatic, Miami Waterfront). This allows managing brokers to test real-time AI criteria extraction and inventory matching safely before onboarding live email streams.</p>',
+                'target_audience' => 'global',
+                'is_active' => true,
+                'sort_order' => 10,
+            ],
         ];
 
         foreach ($faqs as $faqData) {

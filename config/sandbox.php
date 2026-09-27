@@ -20,7 +20,7 @@ return [
         'categories'              => 10,
         'plans'                   => 3,
         'coupons'                 => 5,
-        'faqs'                    => 6,
+        'faqs'                    => 10,
         'contacts'                => 15,
         'clients'                 => 10,
         'ai_modifiers'            => 10,
