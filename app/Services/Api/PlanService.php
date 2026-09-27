@@ -28,6 +28,7 @@ class PlanService
             $plans = Plan::where('is_active', true)
                 ->orderBy('sort_order', 'asc')
                 ->orderBy('id', 'asc') // Fallback prevents database-specific randomized ordering
+                ->take(3)
                 ->get();
 
             return PlanResource::collection($plans)->resolve();
