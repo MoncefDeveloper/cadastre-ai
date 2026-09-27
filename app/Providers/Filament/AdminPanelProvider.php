@@ -109,6 +109,18 @@ class AdminPanelProvider extends PanelProvider
                 PanelsRenderHook::TOPBAR_LOGO_AFTER,
                 fn(): string => Blade::render('@livewire(\App\Livewire\SandboxTopbarWidget::class)')
             )
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn(): string => config('services.clarity.id') ? Blade::render('
+                    <script type="text/javascript">
+                        (function(c,l,a,r,i,t,y){
+                            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+                        })(window, document, "clarity", "script", "' . config('services.clarity.id') . '");
+                    </script>
+                ') : ''
+            )
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
